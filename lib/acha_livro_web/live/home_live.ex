@@ -13,7 +13,7 @@ defmodule AchaLivroWeb.HomeLive do
 
     socket =
       socket
-      |> stream(:books, Books.list_books())
+      |> stream(:books, Books.list_books(), limit: 50)
       |> stream(:terms, Terms.list_terms(scope))
       |> assign(form: to_form(term_changeset))
 
