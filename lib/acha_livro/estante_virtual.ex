@@ -2,7 +2,6 @@ defmodule AchaLivro.EstanteVirtual do
   alias AchaLivro.HttpClient
   alias AchaLivro.Books
   @base_url "https://www.estantevirtual.com.br"
-  @static_files_base_url "https://static.estantevirtual.com.br"
 
   # fazer async talvez n sei
   def scrape_new_books do

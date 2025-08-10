@@ -7,7 +7,7 @@ defmodule AchaLivro.BooksFixtures do
   @doc """
   Generate a book.
   """
-  def book_fixture(scope, attrs \\ %{}) do
+  def book_fixture(attrs \\ %{}) do
     attrs =
       Enum.into(attrs, %{
         description: "some description",
@@ -16,7 +16,7 @@ defmodule AchaLivro.BooksFixtures do
         title: "some title"
       })
 
-    {:ok, book} = AchaLivro.Books.create_book(scope, attrs)
+    {:ok, book} = AchaLivro.Books.create_book(attrs)
     book
   end
 end

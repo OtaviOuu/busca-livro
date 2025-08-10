@@ -82,7 +82,7 @@ defmodule AchaLivroWeb.BookLive.Form do
 
   defp save_book(socket, :new, book_params) do
     case Books.create_book(book_params) do
-      {:ok, book} ->
+      {:ok, _book} ->
         {:noreply,
          socket
          |> put_flash(:info, "Book created successfully")

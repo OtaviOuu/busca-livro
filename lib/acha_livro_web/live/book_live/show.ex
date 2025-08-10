@@ -32,14 +32,10 @@ defmodule AchaLivroWeb.BookLive.Show do
 
   @impl true
   def mount(%{"id" => id}, _session, socket) do
-    if connected?(socket) do
-      Books.subscribe_books(socket.assigns.current_scope)
-    end
-
     {:ok,
      socket
      |> assign(:page_title, "Show Book")
-     |> assign(:book, Books.get_book!(socket.assigns.current_scope, id))}
+     |> assign(:book, Books.get_book!(id))}
   end
 
   @impl true
