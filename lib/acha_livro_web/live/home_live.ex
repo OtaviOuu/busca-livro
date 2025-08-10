@@ -31,16 +31,17 @@ defmodule AchaLivroWeb.HomeLive do
     ]
 
     scope = socket.assigns.current_scope
+    term = %Term{user_id: scope.user.id}
+    term_changeset = Terms.change_term(scope, term)
 
     socket =
       socket
-      |> assign(page_title: "Home")
       |> stream(
         :books,
         books_sample
       )
-      |> assign(terms: Terms.list_terms(scope))
-      |> assign(form: to_form(Terms.change_term(scope, %Term{user_id: scope.user.id})))
+      |> stream(:terms, Terms.list_terms(scope))
+      |> assign(form: to_form(term_changeset))
 
     {:ok, socket}
   end
@@ -48,15 +49,14 @@ defmodule AchaLivroWeb.HomeLive do
   def render(assigns) do
     ~H"""
     <Layouts.app flash={@flash}>
-      <h1>
-        {@current_scope.user.email}
-      </h1>
-      <h1 :for={term <- @terms}>
-        {term.value}
-      </h1>
+      <ul id="terms-list" class="flex flex-row flex-wrap gap-2 p-4" phx-update="stream">
+        <li :for={{dom_id, term} <- @streams.terms} id={dom_id}>
+          <span class="badge badge-primary">{term.value}</span>
+        </li>
+      </ul>
       <.form for={@form} id="term-form" phx-submit="add_term">
         <.input field={@form[:value]} type="text" placeholder="Enter term" />
-        <.button type="submit" class="btn btn-primary">Add Term</.button>
+        <.button type="submit" class="btn btn-primary" phx-disable-with="Adding...">Add Term</.button>
       </.form>
       <div
         class="flex flex-row justify-center gap-6 flex-wrap p-4"
@@ -86,17 +86,21 @@ defmodule AchaLivroWeb.HomeLive do
 
   def handle_event("add_term", %{"term" => %{"value" => term_value}}, socket) do
     user_scope = socket.assigns.current_scope
+    term = %{user_id: user_scope.user.id, value: term_value}
 
-    case Terms.create_term(user_scope, %{value: term_value}) do
+    case Terms.create_term(user_scope, term) do
       {:ok, term} ->
-        IO.inspect(term, label: "Term created successfully")
+        changeset = Terms.change_term(user_scope, %Term{user_id: user_scope.user.id, value: ""})
+
+        socket =
+          socket
+          |> assign(:form, to_form(changeset))
+          |> stream_insert(:terms, term, at: 0)
+
         {:noreply, socket}
 
       {:error, changeset} ->
-        socket = assign(socket, flash: %{error: "Failed to create term: #{changeset}"})
-        {:noreply, socket}
+        {:noreply, assign(socket, :form, to_form(changeset))}
     end
-
-    {:noreply, socket}
   end
 end
