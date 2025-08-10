@@ -14,7 +14,7 @@ defmodule AchaLivro.Books.Book do
   @doc false
   def changeset(book, attrs) do
     book
-    |> cast(attrs, [:title, :description, :image_url, :price])
-    |> validate_required([:title, :description, :image_url, :price])
+    |> cast(attrs, [:title, :description, :image_url, :price, :code])
+    |> validate_required([:title, :description, :image_url, :price, :code])
   end
 end

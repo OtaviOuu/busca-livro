@@ -31,17 +31,17 @@ defmodule AchaLivro.EstanteVirtual do
   end
 
   defp get_useful_book_data(book_data) do
-    code = book_data["sku"]
+    sku_code = String.replace(book_data["sku"], "-BK", "")
 
     %{
       title: book_data["name"],
       price: book_data["offers"]["lowPrice"],
       description: book_data["description"],
-      code: code,
+      code: sku_code,
       image_url:
         @static_files_base_url <>
           "/book/00/" <>
-          code <> "/" <> code <> "_detail1.jpg"
+          sku_code <> "/" <> sku_code <> "_detail1.jpg"
     }
   end
 

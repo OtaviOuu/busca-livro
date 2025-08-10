@@ -4,42 +4,16 @@ defmodule AchaLivroWeb.HomeLive do
   alias AchaLivro.Terms.Term
   alias AchaLivro.Terms
 
+  alias AchaLivro.Books
+
   def mount(_params, _session, socket) do
-    book = %{
-      id: 1,
-      title: "Elixir in Action, Second Edition",
-      description:
-        "A hands-on guide to functional programming and design with Elixir, a dynamic, functional language designed for building scalable and maintainable applications.",
-      price: "69.90",
-      image_url:
-        "https://static.estantevirtual.com.br/book/00/FV7-1031-000/FV7-1031-000_detail1.jpg?ts=1734369956998&ims=fit-in/600x800/filters:fill(fff):quality(100)"
-    }
-
-    books_sample = [
-      Map.put(book, :id, 1),
-      Map.put(book, :id, 2),
-      Map.put(book, :id, 3),
-      Map.put(book, :id, 4),
-      Map.put(book, :id, 5),
-      Map.put(book, :id, 6),
-      Map.put(book, :id, 7),
-      Map.put(book, :id, 8),
-      Map.put(book, :id, 9),
-      Map.put(book, :id, 10),
-      Map.put(book, :id, 11),
-      Map.put(book, :id, 12)
-    ]
-
     scope = socket.assigns.current_scope
     term = %Term{user_id: scope.user.id}
     term_changeset = Terms.change_term(scope, term)
 
     socket =
       socket
-      |> stream(
-        :books,
-        books_sample
-      )
+      |> stream(:books, Books.list_books())
       |> stream(:terms, Terms.list_terms(scope))
       |> assign(form: to_form(term_changeset))
 
@@ -77,7 +51,6 @@ defmodule AchaLivroWeb.HomeLive do
       </figure>
       <div class="card-body p-4">
         <h2 class="card-title text-lg font-semibold line-clamp-2">{@book.title}</h2>
-        <p class="text-sm text-base-content/70 mb-2">{@book.description}</p>
         <p class="text-sm text-base-content/70 mb-2">R$ {@book.price}</p>
       </div>
     </div>
