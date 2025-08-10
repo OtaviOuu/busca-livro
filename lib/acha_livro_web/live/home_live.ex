@@ -63,12 +63,11 @@ defmodule AchaLivroWeb.HomeLive do
 
     case Terms.create_term(user_scope, term) do
       {:ok, term} ->
-        changeset = Terms.change_term(user_scope, %Term{user_id: user_scope.user.id, value: ""})
-
         socket =
           socket
-          |> assign(:form, to_form(changeset))
           |> stream_insert(:terms, term, at: 0)
+          |> put_flash(:info, "Term added successfully")
+          |> push_navigate(to: ~p"/")
 
         {:noreply, socket}
 
