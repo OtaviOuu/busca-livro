@@ -9,6 +9,7 @@ defmodule AchaLivro.Accounts.User do
     field :confirmed_at, :utc_datetime
     field :authenticated_at, :utc_datetime, virtual: true
 
+    has_many :terms, AchaLivro.Terms.Term
     timestamps(type: :utc_datetime)
   end
 
