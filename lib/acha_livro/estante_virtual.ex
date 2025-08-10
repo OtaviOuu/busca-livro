@@ -9,53 +9,38 @@ defmodule AchaLivro.EstanteVirtual do
     {:ok, response} =
       HttpClient.get(@base_url <> "/ciencias-exatas?sort=new-releases&tipo-de-livro=usado")
 
-    books_data =
+    new_books =
       response
-      |> Floki.parse_document!()
-      |> Floki.find(".product-item__link")
-      |> Floki.attribute("href")
-      |> Enum.map(&(@base_url <> &1))
-      |> Enum.map(&scrape_book_data_by_url/1)
+      |> parse_main_page_json()
+      |> get_in(["SearchPage", "parentSkus"])
+      |> Enum.map(&get_useful_book_data/1)
       |> Enum.map(&Books.create_book/1)
 
-    {:ok, books_data}
-  end
-
-  def scrape_book_data_by_url(url) do
-    {:ok, response} = HttpClient.get(url)
-
-    response
-    |> parse_book_json_ld()
-    |> List.first()
-    |> get_useful_book_data()
+    {:ok, new_books}
   end
 
   defp get_useful_book_data(book_data) do
-    sku_code = String.replace(book_data["sku"], "-BK", "")
-
     %{
       title: book_data["name"],
-      price: book_data["offers"]["lowPrice"],
+      price: book_data["listPrice"],
       description: book_data["description"],
-      code: sku_code,
-      image_url:
-        @static_files_base_url <>
-          "/book/00/" <>
-          sku_code <> "/" <> sku_code <> "_detail1.jpg"
+      code: book_data["code"],
+      image_url: book_data["image"]
     }
   end
 
-  defp parse_book_json_ld(html) do
-    regex = ~r/<script[^>]*type=["']application\/ld\+json["'][^>]*>(.*?)<\/script>/s
+  defp parse_main_page_json(html) do
+    regex = ~r/window\.__INITIAL_STATE__\s*=\s*(\{.*\})/s
 
-    matches = Regex.scan(regex, html)
+    case Regex.run(regex, html) do
+      [_, json_string] ->
+        case Jason.decode(json_string) do
+          {:ok, map} ->
+            map
 
-    for [_, json_str] <- matches do
-      json_str
-      |> String.trim()
-      |> Jason.decode!()
-      |> Map.get("@graph")
-      |> List.first()
+          {:error, _error} ->
+            nil
+        end
     end
   end
 end
