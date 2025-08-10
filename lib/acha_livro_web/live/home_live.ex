@@ -22,7 +22,7 @@ defmodule AchaLivroWeb.HomeLive do
 
   def render(assigns) do
     ~H"""
-    <Layouts.app flash={@flash}>
+    <Layouts.app flash={@flash} current_scope={@current_scope}>
       <ul id="terms-list" class="flex flex-row flex-wrap gap-2 p-4" phx-update="stream">
         <li :for={{dom_id, term} <- @streams.terms} id={dom_id}>
           <span class="badge badge-primary">{term.value}</span>
