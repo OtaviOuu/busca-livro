@@ -8,13 +8,14 @@ defmodule AchaLivro.Books.Book do
     field :image_url, :string
     field :price, :decimal
     field :code, :string
+    field :href, :string, default: ""
     timestamps(type: :utc_datetime)
   end
 
   @doc false
   def changeset(book, attrs) do
     book
-    |> cast(attrs, [:title, :description, :image_url, :price, :code])
-    |> validate_required([:title, :description, :image_url, :price, :code])
+    |> cast(attrs, [:title, :description, :image_url, :price, :code, :href])
+    |> validate_required([:title, :description, :image_url, :price, :code, :href])
   end
 end
