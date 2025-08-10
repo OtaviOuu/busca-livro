@@ -46,9 +46,11 @@ defmodule AchaLivroWeb.HomeLive do
   def books_grid(assigns) do
     ~H"""
     <div class="card bg-base-100 w-64 shadow-sm hover:shadow-md transition-shadow" id={@id}>
-      <figure class="px-4 pt-4">
-        <img src={@book.image_url} alt="Livro" class="rounded-xl w-full h-80 object-cover" />
-      </figure>
+      <a href={@book.href} target="_blank" class="block">
+        <figure class="px-4 pt-4">
+          <img src={@book.image_url} alt="Livro" class="rounded-xl w-full h-80 object-cover" />
+        </figure>
+      </a>
       <div class="card-body p-4">
         <h2 class="card-title text-lg font-semibold line-clamp-2">{@book.title}</h2>
         <p class="text-sm text-base-content/70 mb-2">R$ {@book.price}</p>

@@ -19,12 +19,15 @@ defmodule AchaLivro.EstanteVirtual do
   end
 
   defp get_useful_book_data(book_data) do
+    href = (@base_url <> book_data["productSlug"]) |> String.replace("(\u002F", "/")
+
     %{
       title: book_data["name"],
       price: book_data["listPrice"],
       description: book_data["description"],
       code: book_data["code"],
-      image_url: book_data["image"]
+      image_url: book_data["image"],
+      href: href
     }
   end
 
