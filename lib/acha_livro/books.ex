@@ -80,30 +80,11 @@ defmodule AchaLivro.Books do
            %Book{}
            |> Book.changeset(attrs)
            |> Repo.insert()
-           |> confere_termos() do
+           |> Notifier.confere_termos() do
       broadcast_books({:new_book, book})
 
       {:ok, book}
     end
-  end
-
-  # livro novo -> titulo tem termo -> criar alerta
-  def confere_termos({:ok, %Book{} = book}) do
-    terms =
-      AchaLivro.Terms.Term
-      |> preload(:user)
-      |> Repo.all()
-
-    for term <- terms do
-      if String.contains?(book.title, term.value) do
-        Notifier.broadcast(
-          %Scope{user: term.user},
-          {:found_book, book}
-        )
-      end
-    end
-
-    {:ok, book}
   end
 
   @doc """
