@@ -7,6 +7,10 @@ defmodule AchaLivroWeb.HomeLive do
   alias AchaLivro.Books
 
   def mount(_params, _session, socket) do
+    if connected?(socket) do
+      Books.subscribe_books()
+    end
+
     scope = socket.assigns.current_scope
     term = %Term{user_id: scope.user.id}
     term_changeset = Terms.change_term(scope, term)
@@ -80,5 +84,9 @@ defmodule AchaLivroWeb.HomeLive do
       {:error, changeset} ->
         {:noreply, assign(socket, :form, to_form(changeset))}
     end
+  end
+
+  def handle_info({:new_book, book}, socket) do
+    {:noreply, stream_insert(socket, :books, book, at: 0)}
   end
 end

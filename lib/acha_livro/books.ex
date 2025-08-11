@@ -8,6 +8,14 @@ defmodule AchaLivro.Books do
 
   alias AchaLivro.Books.Book
 
+  def subscribe_books do
+    Phoenix.PubSub.subscribe(AchaLivro.PubSub, "books")
+  end
+
+  def broadcast_books(message) do
+    Phoenix.PubSub.broadcast(AchaLivro.PubSub, "books", message)
+  end
+
   @doc """
   Returns the list of books.
 
@@ -18,7 +26,9 @@ defmodule AchaLivro.Books do
 
   """
   def list_books() do
-    Repo.all(Book)
+    Book
+    |> order_by([b], desc: b.inserted_at)
+    |> Repo.all()
   end
 
   @doc """
@@ -52,10 +62,13 @@ defmodule AchaLivro.Books do
 
   """
   def create_book(attrs) do
+    Process.sleep(5_000)
+
     with {:ok, book = %Book{}} <-
            %Book{}
            |> Book.changeset(attrs)
            |> Repo.insert() do
+      broadcast_books({:new_book, book})
       {:ok, book}
     end
   end
