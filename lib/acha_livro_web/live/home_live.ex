@@ -4,19 +4,21 @@ defmodule AchaLivroWeb.HomeLive do
   alias AchaLivro.Terms.Term
   alias AchaLivro.Terms
   alias AchaLivro.Books
+  alias AchaLivro.Notifier
 
   @max_books 20
 
   def mount(_params, _session, socket) do
     if connected?(socket) do
+      send(self(), :load_books)
+
       Books.subscribe_books()
+      Notifier.subscribe(socket.assigns.current_scope)
     end
 
     scope = socket.assigns.current_scope
     term = %Term{user_id: scope.user.id}
     term_changeset = Terms.change_term(scope, term)
-
-    send(self(), :load_books)
 
     socket =
       socket
@@ -137,6 +139,14 @@ defmodule AchaLivroWeb.HomeLive do
       # |> put_flash(:info, "New book added: #{book.title}")
       |> assign(len_books: socket.assigns.len_books + 1)
       |> stream_insert(:books, book, at: 0, limit: @max_books)
+
+    {:noreply, socket}
+  end
+
+  def handle_info({:found_book, book}, socket) do
+    socket =
+      socket
+      |> put_flash(:info, "New book found: #{book.title}")
 
     {:noreply, socket}
   end

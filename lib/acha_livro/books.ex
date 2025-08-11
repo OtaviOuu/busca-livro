@@ -5,8 +5,9 @@ defmodule AchaLivro.Books do
 
   import Ecto.Query, warn: false
   alias AchaLivro.Repo
-
+  alias AchaLivro.Notifier
   alias AchaLivro.Books.Book
+  alias AchaLivro.Accounts.Scope
 
   def subscribe_books do
     Phoenix.PubSub.subscribe(AchaLivro.PubSub, "books")
@@ -78,10 +79,31 @@ defmodule AchaLivro.Books do
     with {:ok, book = %Book{}} <-
            %Book{}
            |> Book.changeset(attrs)
-           |> Repo.insert() do
+           |> Repo.insert()
+           |> confere_termos() do
       broadcast_books({:new_book, book})
+
       {:ok, book}
     end
+  end
+
+  # livro novo -> titulo tem termo -> criar alerta
+  def confere_termos({:ok, %Book{} = book}) do
+    terms =
+      AchaLivro.Terms.Term
+      |> preload(:user)
+      |> Repo.all()
+
+    for term <- terms do
+      if String.contains?(book.title, term.value) do
+        Notifier.broadcast(
+          %Scope{user: term.user},
+          {:found_book, book}
+        )
+      end
+    end
+
+    {:ok, book}
   end
 
   @doc """
