@@ -55,19 +55,23 @@ defmodule AchaLivroWeb.Layouts do
             <li>
               {@current_scope.user.email}
             </li>
-            <li>
-              <.link class="btn" href={~p"/users/settings"}>Settings</.link>
-            </li>
-            <li>
-              <.link class="btn" href={~p"/users/log-out"} method="delete">Log out</.link>
-            </li>
+            <div class="join">
+              <li>
+                <.link class="btn" href={~p"/users/settings"}>Settings</.link>
+              </li>
+              <li>
+                <.link class="btn" href={~p"/users/log-out"} method="delete">Log out</.link>
+              </li>
+            </div>
           <% else %>
-            <li>
-              <.link class="btn" href={~p"/users/register"}>Register</.link>
-            </li>
-            <li>
-              <.link class="btn" href={~p"/users/log-in"}>Log in</.link>
-            </li>
+            <div class="join">
+              <li>
+                <.link class="btn" href={~p"/users/register"}>Register</.link>
+              </li>
+              <li>
+                <.link class="btn" href={~p"/users/log-in"}>Log in</.link>
+              </li>
+            </div>
           <% end %>
         </ul>
       </div>
