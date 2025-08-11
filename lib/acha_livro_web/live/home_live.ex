@@ -81,17 +81,13 @@ defmodule AchaLivroWeb.HomeLive do
 
     case Terms.create_term(user_scope, term) do
       {:ok, term} ->
+        changeset =
+          Terms.change_term(user_scope, %Term{user_id: user_scope.user.id}, %{value: ""})
+
         socket =
           socket
           |> stream_insert(:terms, term, at: 0)
-          |> assign(
-            form:
-              to_form(
-                Terms.change_term(user_scope, %Term{user_id: user_scope.user.id}, %{
-                  value: ""
-                })
-              )
-          )
+          |> assign(form: to_form(changeset))
 
         {:noreply, socket}
 
@@ -101,18 +97,12 @@ defmodule AchaLivroWeb.HomeLive do
   end
 
   def handle_event("change", params, socket) do
-    form =
-      to_form(
-        Terms.change_term(
-          socket.assigns.current_scope,
-          %Term{
-            user_id: socket.assigns.current_scope.user.id
-          },
-          params
-        )
-      )
+    current_scope = socket.assigns.current_scope
 
-    {:noreply, assign(socket, form: form)}
+    changeset =
+      Terms.change_term(current_scope, %Term{user_id: current_scope.user.id}, params)
+
+    {:noreply, assign(socket, form: to_form(changeset))}
   end
 
   def handle_info({:new_book, book}, socket) do
