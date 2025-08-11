@@ -11,9 +11,12 @@ defmodule AchaLivroWeb.HomeLive do
     term = %Term{user_id: scope.user.id}
     term_changeset = Terms.change_term(scope, term)
 
+    books = Books.list_books()
+
     socket =
       socket
-      |> stream(:books, Books.list_books(), limit: 50)
+      |> assign(:len_books, length(books))
+      |> stream(:books, books, limit: 50)
       |> stream(:terms, Terms.list_terms(scope))
       |> assign(form: to_form(term_changeset))
 
@@ -23,6 +26,7 @@ defmodule AchaLivroWeb.HomeLive do
   def render(assigns) do
     ~H"""
     <Layouts.app flash={@flash} current_scope={@current_scope}>
+      {@len_books}
       <ul id="terms-list" class="flex flex-row flex-wrap gap-2 p-4" phx-update="stream">
         <li :for={{dom_id, term} <- @streams.terms} id={dom_id}>
           <span class="badge badge-primary">{term.value}</span>

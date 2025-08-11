@@ -11,6 +11,7 @@ defmodule AchaLivro.Application do
       AchaLivroWeb.Telemetry,
       AchaLivro.Repo,
       {DNSCluster, query: Application.get_env(:acha_livro, :dns_cluster_query) || :ignore},
+      {Oban, Application.fetch_env!(:acha_livro, Oban)},
       {Phoenix.PubSub, name: AchaLivro.PubSub},
       # Start a worker by calling: AchaLivro.Worker.start_link(arg)
       # {AchaLivro.Worker, arg},

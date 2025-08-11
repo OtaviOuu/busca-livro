@@ -1,6 +1,7 @@
 defmodule AchaLivroWeb.Router do
   use AchaLivroWeb, :router
 
+  import Oban.Web.Router
   import AchaLivroWeb.UserAuth
 
   pipeline :browser do
@@ -52,6 +53,12 @@ defmodule AchaLivroWeb.Router do
 
       live_dashboard "/dashboard", metrics: AchaLivroWeb.Telemetry
       forward "/mailbox", Plug.Swoosh.MailboxPreview
+    end
+
+    scope "/" do
+      pipe_through :browser
+
+      oban_dashboard("/oban")
     end
   end
 

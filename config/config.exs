@@ -20,6 +20,16 @@ config :acha_livro, :scopes,
     test_setup_helper: :register_and_log_in_user
   ]
 
+config :acha_livro, Oban,
+  repo: AchaLivro.Repo,
+  queues: [estante_virtual: 10],
+  plugins: [
+    {Oban.Plugins.Cron,
+     crontab: [
+       {"* * * * *", AchaLivro.Workers.EstanteVirtual}
+     ]}
+  ]
+
 config :acha_livro,
   ecto_repos: [AchaLivro.Repo],
   generators: [timestamp_type: :utc_datetime]
