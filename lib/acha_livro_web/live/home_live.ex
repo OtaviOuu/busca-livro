@@ -20,7 +20,6 @@ defmodule AchaLivroWeb.HomeLive do
     socket =
       socket
       |> assign(:load_books, true)
-      |> stream(:terms, Terms.list_terms(scope))
       |> assign(form: to_form(term_changeset))
 
     {:ok, socket}
@@ -39,11 +38,12 @@ defmodule AchaLivroWeb.HomeLive do
             <span class="badge badge-primary">{term.value}</span>
           </li>
         </ul>
+
         {@len_books}
 
-        <.form for={@form} id="term-form" phx-submit="add_term">
+        <.form for={@form} id="term-form" phx-submit="add_term" phx-change="change">
           <.input field={@form[:value]} type="text" placeholder="Enter term" />
-          <.button type="submit" class="btn btn-primary" phx-disable-with="Adding...">
+          <.button class="btn btn-primary" phx-disable-with="Adding...">
             Add Term
           </.button>
         </.form>
@@ -84,14 +84,35 @@ defmodule AchaLivroWeb.HomeLive do
         socket =
           socket
           |> stream_insert(:terms, term, at: 0)
-          |> put_flash(:info, "Term added successfully")
-          |> push_navigate(to: ~p"/")
+          |> assign(
+            form:
+              to_form(
+                Terms.change_term(user_scope, %Term{user_id: user_scope.user.id}, %{
+                  value: ""
+                })
+              )
+          )
 
         {:noreply, socket}
 
       {:error, changeset} ->
         {:noreply, assign(socket, :form, to_form(changeset))}
     end
+  end
+
+  def handle_event("change", params, socket) do
+    form =
+      to_form(
+        Terms.change_term(
+          socket.assigns.current_scope,
+          %Term{
+            user_id: socket.assigns.current_scope.user.id
+          },
+          params
+        )
+      )
+
+    {:noreply, assign(socket, form: form)}
   end
 
   def handle_info({:new_book, book}, socket) do
@@ -106,12 +127,14 @@ defmodule AchaLivroWeb.HomeLive do
 
   def handle_info(:load_books, socket) do
     books = Books.list_books()
+    terms = Terms.list_terms(socket.assigns.current_scope)
 
     socket =
       socket
       |> assign(:load_books, false)
       |> assign(:len_books, length(books))
       |> stream(:books, books, limit: 50)
+      |> stream(:terms, terms)
 
     {:noreply, socket}
   end
