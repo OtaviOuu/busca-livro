@@ -15,12 +15,11 @@ defmodule AchaLivroWeb.HomeLive do
     term = %Term{user_id: scope.user.id}
     term_changeset = Terms.change_term(scope, term)
 
-    books = Books.list_books()
+    send(self(), :load_books)
 
     socket =
       socket
-      |> assign(:len_books, length(books))
-      |> stream(:books, books, limit: 50)
+      |> assign(:load_books, true)
       |> stream(:terms, Terms.list_terms(scope))
       |> assign(form: to_form(term_changeset))
 
@@ -30,23 +29,32 @@ defmodule AchaLivroWeb.HomeLive do
   def render(assigns) do
     ~H"""
     <Layouts.app flash={@flash} current_scope={@current_scope}>
-      {@len_books}
-      <ul id="terms-list" class="flex flex-row flex-wrap gap-2 p-4" phx-update="stream">
-        <li :for={{dom_id, term} <- @streams.terms} id={dom_id}>
-          <span class="badge badge-primary">{term.value}</span>
-        </li>
-      </ul>
-      <.form for={@form} id="term-form" phx-submit="add_term">
-        <.input field={@form[:value]} type="text" placeholder="Enter term" />
-        <.button type="submit" class="btn btn-primary" phx-disable-with="Adding...">Add Term</.button>
-      </.form>
-      <div
-        class="flex flex-row justify-center gap-6 flex-wrap p-4"
-        phx-update="stream"
-        id="books-grid"
-      >
-        <.books_grid :for={{dom_id, book} <- @streams.books} book={book} id={dom_id} />
-      </div>
+      <%= if @load_books do %>
+        <div class="flex justify-center items-center h-screen">
+          <span class="loading loading-spinner loading-xl"></span>
+        </div>
+      <% else %>
+        <ul id="terms-list" class="flex flex-row flex-wrap gap-2 p-4" phx-update="stream">
+          <li :for={{dom_id, term} <- @streams.terms} id={dom_id}>
+            <span class="badge badge-primary">{term.value}</span>
+          </li>
+        </ul>
+        {@len_books}
+
+        <.form for={@form} id="term-form" phx-submit="add_term">
+          <.input field={@form[:value]} type="text" placeholder="Enter term" />
+          <.button type="submit" class="btn btn-primary" phx-disable-with="Adding...">
+            Add Term
+          </.button>
+        </.form>
+        <div
+          class="flex flex-row justify-center gap-6 flex-wrap p-4"
+          phx-update="stream"
+          id="books-grid"
+        >
+          <.books_grid :for={{dom_id, book} <- @streams.books} book={book} id={dom_id} />
+        </div>
+      <% end %>
     </Layouts.app>
     """
   end
@@ -87,6 +95,24 @@ defmodule AchaLivroWeb.HomeLive do
   end
 
   def handle_info({:new_book, book}, socket) do
-    {:noreply, stream_insert(socket, :books, book, at: 0)}
+    socket =
+      socket
+      # |> put_flash(:info, "New book added: #{book.title}")
+      |> assign(len_books: socket.assigns.len_books + 1)
+      |> stream_insert(:books, book, at: 0)
+
+    {:noreply, socket}
+  end
+
+  def handle_info(:load_books, socket) do
+    books = Books.list_books()
+
+    socket =
+      socket
+      |> assign(:load_books, false)
+      |> assign(:len_books, length(books))
+      |> stream(:books, books, limit: 50)
+
+    {:noreply, socket}
   end
 end
