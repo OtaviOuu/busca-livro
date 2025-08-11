@@ -6,6 +6,8 @@ defmodule AchaLivroWeb.HomeLive do
 
   alias AchaLivro.Books
 
+  @max_books 3
+
   def mount(_params, _session, socket) do
     if connected?(socket) do
       Books.subscribe_books()
@@ -61,7 +63,12 @@ defmodule AchaLivroWeb.HomeLive do
 
   def books_grid(assigns) do
     ~H"""
-    <div class="card bg-base-100 w-64 shadow-sm hover:shadow-md transition-shadow" id={@id}>
+    <div
+      class="card bg-base-100 w-64 shadow-sm hover:shadow-md transition"
+      id={@id}
+      phx-mounted={JS.transition({"ease-out duration-300", "opacity-0", "opacity-100"}, time: 300)}
+      phx-remove={JS.transition({"ease-in duration-300", "opacity-100", "opacity-0"}, time: 300)}
+    >
       <a href={@book.href} target="_blank" class="block">
         <figure class="px-4 pt-4">
           <img src={@book.image_url} alt="Livro" class="rounded-xl w-full h-80 object-cover" />
@@ -108,9 +115,9 @@ defmodule AchaLivroWeb.HomeLive do
   def handle_info({:new_book, book}, socket) do
     socket =
       socket
-      # |> put_flash(:info, "New book added: #{book.title}")
+      |> put_flash(:info, "New book added: #{book.title}")
       |> assign(len_books: socket.assigns.len_books + 1)
-      |> stream_insert(:books, book, at: 0)
+      |> stream_insert(:books, book, at: 0, limit: @max_books)
 
     {:noreply, socket}
   end
@@ -123,7 +130,7 @@ defmodule AchaLivroWeb.HomeLive do
       socket
       |> assign(:load_books, false)
       |> assign(:len_books, length(books))
-      |> stream(:books, books, limit: 50)
+      |> stream(:books, books, limit: @max_books)
       |> stream(:terms, terms)
 
     {:noreply, socket}
