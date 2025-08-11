@@ -6,7 +6,7 @@ defmodule AchaLivroWeb.HomeLive do
 
   alias AchaLivro.Books
 
-  @max_books 3
+  @max_books 50
 
   def mount(_params, _session, socket) do
     if connected?(socket) do
@@ -123,7 +123,7 @@ defmodule AchaLivroWeb.HomeLive do
   end
 
   def handle_info(:load_books, socket) do
-    books = Books.list_books()
+    books = Books.list_books(@max_books)
     terms = Terms.list_terms(socket.assigns.current_scope)
 
     socket =

@@ -25,9 +25,16 @@ defmodule AchaLivro.Books do
       [%Book{}, ...]
 
   """
-  def list_books() do
+  def list_books do
     Book
     |> order_by([b], desc: b.inserted_at)
+    |> Repo.all()
+  end
+
+  def list_books(max_books) when is_integer(max_books) and max_books > 0 do
+    Book
+    |> order_by([b], desc: b.inserted_at)
+    |> limit(^max_books)
     |> Repo.all()
   end
 
