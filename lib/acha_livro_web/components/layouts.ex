@@ -4,6 +4,7 @@ defmodule AchaLivroWeb.Layouts do
   used by your application.
   """
   use AchaLivroWeb, :html
+  alias Contex.Sparkline
 
   # Embed all files in layouts/* within this module.
   # The default root.html.heex file contains the HTML
@@ -44,6 +45,9 @@ defmodule AchaLivroWeb.Layouts do
       </div>
       <div class="flex-none">
         <ul class="flex flex-column px-1 space-x-4 items-center">
+          <li>
+            {spark_line()}
+          </li>
           <li>
             <.theme_toggle />
           </li>
@@ -158,5 +162,11 @@ defmodule AchaLivroWeb.Layouts do
       </button>
     </div>
     """
+  end
+
+  defp spark_line do
+    data = Enum.map(1..13, fn _ -> :rand.uniform(20) - 1 end)
+    # Emits svg sparkline
+    Sparkline.new(data) |> Sparkline.draw()
   end
 end

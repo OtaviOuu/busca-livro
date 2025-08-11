@@ -3,10 +3,9 @@ defmodule AchaLivroWeb.HomeLive do
 
   alias AchaLivro.Terms.Term
   alias AchaLivro.Terms
-
   alias AchaLivro.Books
 
-  @max_books 50
+  @max_books 20
 
   def mount(_params, _session, socket) do
     if connected?(socket) do
@@ -31,8 +30,8 @@ defmodule AchaLivroWeb.HomeLive do
     ~H"""
     <Layouts.app flash={@flash} current_scope={@current_scope}>
       <%= if @load_books do %>
-        <div class="flex justify-center items-center h-screen">
-          <span class="loading loading-spinner loading-xl"></span>
+        <div class="flex flex-row justify-center gap-6 flex-wrap p-4">
+          <.book_grid_skeleton :for={_book <- 1..get_max_books()} />
         </div>
       <% else %>
         <ul id="terms-list" class="flex flex-row flex-wrap gap-2 p-4" phx-update="stream">
@@ -41,8 +40,7 @@ defmodule AchaLivroWeb.HomeLive do
           </li>
         </ul>
 
-        {@len_books}
-
+        {@len_books} books found.
         <.form for={@form} id="term-form" phx-submit="add_term" phx-change="change">
           <.input field={@form[:value]} type="text" placeholder="Enter term" />
           <.button class="btn btn-primary" phx-disable-with="Adding...">
@@ -61,13 +59,31 @@ defmodule AchaLivroWeb.HomeLive do
     """
   end
 
+  def book_grid_skeleton(assigns) do
+    ~H"""
+    <div class="card bg-base-100 w-64 shadow-sm hover:shadow-md transition">
+      <div class="px-4 pt-4">
+        <div class="skeleton h-80 w-full rounded-xl"></div>
+      </div>
+      <div class="card-body p-4">
+        <h2 class="card-title text-lg font-semibold line-clamp-2">
+          <div class="skeleton h-6 w-full"></div>
+        </h2>
+        <p class="text-sm text-base-content/70 mb-2">
+          <div class="skeleton h-4 w-24"></div>
+        </p>
+      </div>
+    </div>
+    """
+  end
+
   def books_grid(assigns) do
     ~H"""
     <div
       class="card bg-base-100 w-64 shadow-sm hover:shadow-md transition"
       id={@id}
-      phx-mounted={JS.transition({"ease-out duration-300", "opacity-0", "opacity-100"}, time: 300)}
-      phx-remove={JS.transition({"ease-in duration-300", "opacity-100", "opacity-0"}, time: 300)}
+      phx-mounted={JS.transition({"ease-out duration-600", "opacity-0", "opacity-100"}, time: 600)}
+      phx-remove={JS.transition({"ease-in duration-600", "opacity-100", "opacity-0"}, time: 600)}
     >
       <a href={@book.href} target="_blank" class="block">
         <figure class="px-4 pt-4">
@@ -76,6 +92,9 @@ defmodule AchaLivroWeb.HomeLive do
       </a>
       <div class="card-body p-4">
         <h2 class="card-title text-lg font-semibold line-clamp-2">{@book.title}</h2>
+        <div class="flex flex-row justify-center gap-4">
+          <img src={~p"/images/estante-virtual-logo.png"} width="50" />
+        </div>
         <p class="text-sm text-base-content/70 mb-2">R$ {@book.price}</p>
       </div>
     </div>
@@ -115,7 +134,7 @@ defmodule AchaLivroWeb.HomeLive do
   def handle_info({:new_book, book}, socket) do
     socket =
       socket
-      |> put_flash(:info, "New book added: #{book.title}")
+      # |> put_flash(:info, "New book added: #{book.title}")
       |> assign(len_books: socket.assigns.len_books + 1)
       |> stream_insert(:books, book, at: 0, limit: @max_books)
 
@@ -129,10 +148,14 @@ defmodule AchaLivroWeb.HomeLive do
     socket =
       socket
       |> assign(:load_books, false)
-      |> assign(:len_books, length(books))
+      |> assign(:len_books, Books.how_many_books())
       |> stream(:books, books, limit: @max_books)
       |> stream(:terms, terms)
 
     {:noreply, socket}
+  end
+
+  def get_max_books do
+    @max_books
   end
 end

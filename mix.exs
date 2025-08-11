@@ -64,7 +64,8 @@ defmodule AchaLivro.MixProject do
       {:floki, "~> 0.38.0"},
       {:oban, "~> 2.19"},
       {:oban_web, "~> 2.11"},
-      {:igniter, "~> 0.5", only: [:dev]}
+      {:igniter, "~> 0.5", only: [:dev]},
+      {:contex, "~> 0.5.0"}
     ]
   end
 

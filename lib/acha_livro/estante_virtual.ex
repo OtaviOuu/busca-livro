@@ -23,7 +23,8 @@ defmodule AchaLivro.EstanteVirtual do
 
     %{
       title: book_data["name"],
-      price: book_data["listPrice"],
+      # Money dps
+      price: book_data["listPrice"] / 100,
       description: book_data["description"],
       code: book_data["code"],
       image_url: book_data["image"],

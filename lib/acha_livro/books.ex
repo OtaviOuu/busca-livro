@@ -38,6 +38,10 @@ defmodule AchaLivro.Books do
     |> Repo.all()
   end
 
+  def how_many_books do
+    Repo.aggregate(Book, :count, :id)
+  end
+
   @doc """
   Gets a single book.
 
