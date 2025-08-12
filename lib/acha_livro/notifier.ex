@@ -1,6 +1,7 @@
 defmodule AchaLivro.Notifier do
   alias AchaLivro.Accounts.Scope
   alias AchaLivro.Books.Book
+  alias AchaLivro.Achados
   alias AchaLivro.Repo
   import Ecto.Query, warn: false
 
@@ -22,6 +23,8 @@ defmodule AchaLivro.Notifier do
       user_scope = %Scope{user: term.user}
 
       if String.contains?(book.title, term.value) do
+        {:ok, achado} = Achados.create_achado(user_scope, %{book_id: book.id})
+        IO.inspect(achado, label: "Achado created")
         broadcast(user_scope, {:found_book, book})
       end
     end

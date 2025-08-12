@@ -31,6 +31,7 @@ defmodule AchaLivroWeb.Router do
     live_session :default,
       on_mount: [{AchaLivroWeb.UserAuth, :mount_current_scope}] do
       live "/", HomeLive, :index
+      live "/me", MeLive, :index
     end
   end
 
