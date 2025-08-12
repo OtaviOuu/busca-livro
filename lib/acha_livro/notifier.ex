@@ -12,8 +12,7 @@ defmodule AchaLivro.Notifier do
     Phoenix.PubSub.broadcast(AchaLivro.PubSub, "notifications:#{scope.user.id}", message)
   end
 
-  # livro novo -> titulo tem termo -> criar alerta
-  def confere_termos({:ok, %Book{} = book}) do
+  def call({:ok, %Book{} = book}) do
     terms =
       AchaLivro.Terms.Term
       |> preload(:user)

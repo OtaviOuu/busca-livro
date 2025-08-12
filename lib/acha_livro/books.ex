@@ -80,7 +80,7 @@ defmodule AchaLivro.Books do
            %Book{}
            |> Book.changeset(attrs)
            |> Repo.insert()
-           |> Notifier.confere_termos() do
+           |> Notifier.call() do
       broadcast_books({:new_book, book})
 
       {:ok, book}
