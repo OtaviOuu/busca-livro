@@ -4,8 +4,7 @@ defmodule AchaLivroWeb.HomeLive do
   alias AchaLivro.Terms.Term
   alias AchaLivro.Terms
   alias AchaLivro.Books
-  alias AchaLivro.Notifier
-
+  alias AchaLivro.Achados
   alias AchaLivroWeb.CustomComponents
 
   @max_books 20
@@ -15,7 +14,7 @@ defmodule AchaLivroWeb.HomeLive do
       send(self(), :load_books)
 
       Books.subscribe_books()
-      Notifier.subscribe(socket.assigns.current_scope)
+      Achados.subscribe_achados(socket.assigns.current_scope)
     end
 
     scope = socket.assigns.current_scope
@@ -121,10 +120,10 @@ defmodule AchaLivroWeb.HomeLive do
     {:noreply, socket}
   end
 
-  def handle_info({:found_book, book}, socket) do
+  def handle_info({:created, achado}, socket) do
     socket =
       socket
-      |> put_flash(:info, "New book found: #{book.title}")
+      |> put_flash(:info, "New book found: #{achado.book.title}")
 
     {:noreply, socket}
   end

@@ -7,7 +7,6 @@ defmodule AchaLivro.Books do
   alias AchaLivro.Repo
   alias AchaLivro.Notifier
   alias AchaLivro.Books.Book
-  alias AchaLivro.Accounts.Scope
 
   def subscribe_books do
     Phoenix.PubSub.subscribe(AchaLivro.PubSub, "books")

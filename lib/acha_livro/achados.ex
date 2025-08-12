@@ -83,6 +83,7 @@ defmodule AchaLivro.Achados do
            %Achado{}
            |> Achado.changeset(attrs, scope)
            |> Repo.insert() do
+      achado = Repo.preload(achado, :book)
       broadcast(scope, {:created, achado})
       {:ok, achado}
     end

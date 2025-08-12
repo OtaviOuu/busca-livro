@@ -23,9 +23,8 @@ defmodule AchaLivro.Notifier do
       user_scope = %Scope{user: term.user}
 
       if String.contains?(book.title, term.value) do
-        {:ok, achado} = Achados.create_achado(user_scope, %{book_id: book.id})
-        IO.inspect(achado, label: "Achado created")
-        broadcast(user_scope, {:found_book, book})
+        {:ok, _achado} = Achados.create_achado(user_scope, %{book_id: book.id})
+        # AchaLivro.Achados.broadcast(user_scope, {:found_book, achado})
       end
     end
 
