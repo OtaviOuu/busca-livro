@@ -57,22 +57,22 @@ defmodule AchaLivroWeb.Layouts do
             </li>
             <div class="join">
               <li>
-                <.link class="btn" href={~p"/me"}>Me</.link>
+                <.link class="btn" navigate={~p"/me"}>Me</.link>
               </li>
               <li>
-                <.link class="btn" href={~p"/users/settings"}>Settings</.link>
+                <.link class="btn" navigate={~p"/users/settings"}>Settings</.link>
               </li>
               <li>
-                <.link class="btn" href={~p"/users/log-out"} method="delete">Log out</.link>
+                <.link class="btn" navigate={~p"/users/log-out"} method="delete">Log out</.link>
               </li>
             </div>
           <% else %>
             <div class="join">
               <li>
-                <.link class="btn" href={~p"/users/register"}>Register</.link>
+                <.link class="btn" navigate={~p"/users/register"}>Register</.link>
               </li>
               <li>
-                <.link class="btn" href={~p"/users/log-in"}>Log in</.link>
+                <.link class="btn" navigate={~p"/users/log-in"}>Log in</.link>
               </li>
             </div>
           <% end %>
