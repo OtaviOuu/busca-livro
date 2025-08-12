@@ -48,6 +48,15 @@ defmodule AchaLivro.Achados do
     |> Repo.all()
   end
 
+  def list_achados(%Scope{} = scope, max) do
+    Achado
+    |> limit(^max)
+    |> where(user_id: ^scope.user.id)
+    |> preload(:book)
+    |> order_by(desc: :inserted_at)
+    |> Repo.all()
+  end
+
   @doc """
   Gets a single achado.
 

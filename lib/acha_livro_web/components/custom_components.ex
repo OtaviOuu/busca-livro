@@ -24,4 +24,22 @@ defmodule AchaLivroWeb.CustomComponents do
     </div>
     """
   end
+
+  def book_card_skeleton(assigns) do
+    ~H"""
+    <div class="card bg-base-100 w-64 shadow-sm hover:shadow-md transition">
+      <div class="px-4 pt-4">
+        <div class="skeleton h-80 w-full rounded-xl"></div>
+      </div>
+      <div class="card-body p-4">
+        <h2 class="card-title text-lg font-semibold line-clamp-2">
+          <div class="skeleton h-6 w-full"></div>
+        </h2>
+        <p class="text-sm text-base-content/70 mb-2">
+          <div class="skeleton h-4 w-24"></div>
+        </p>
+      </div>
+    </div>
+    """
+  end
 end

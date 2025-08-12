@@ -34,7 +34,7 @@ defmodule AchaLivroWeb.HomeLive do
     <Layouts.app flash={@flash} current_scope={@current_scope}>
       <%= if @load_books do %>
         <div class="flex flex-row justify-center gap-6 flex-wrap p-4">
-          <.book_grid_skeleton :for={_book <- 1..get_max_books()} />
+          <CustomComponents.book_card_skeleton :for={_book <- 1..get_max_books()} />
         </div>
       <% else %>
         <ul id="terms-list" class="flex flex-row flex-wrap gap-2 p-4" phx-update="stream">
@@ -59,24 +59,6 @@ defmodule AchaLivroWeb.HomeLive do
         </div>
       <% end %>
     </Layouts.app>
-    """
-  end
-
-  def book_grid_skeleton(assigns) do
-    ~H"""
-    <div class="card bg-base-100 w-64 shadow-sm hover:shadow-md transition">
-      <div class="px-4 pt-4">
-        <div class="skeleton h-80 w-full rounded-xl"></div>
-      </div>
-      <div class="card-body p-4">
-        <h2 class="card-title text-lg font-semibold line-clamp-2">
-          <div class="skeleton h-6 w-full"></div>
-        </h2>
-        <p class="text-sm text-base-content/70 mb-2">
-          <div class="skeleton h-4 w-24"></div>
-        </p>
-      </div>
-    </div>
     """
   end
 
