@@ -6,6 +6,8 @@ defmodule AchaLivroWeb.HomeLive do
   alias AchaLivro.Books
   alias AchaLivro.Notifier
 
+  alias AchaLivroWeb.CustomComponents
+
   @max_books 20
 
   def mount(_params, _session, socket) do
@@ -54,7 +56,7 @@ defmodule AchaLivroWeb.HomeLive do
           phx-update="stream"
           id="books-grid"
         >
-          <.books_grid :for={{dom_id, book} <- @streams.books} book={book} id={dom_id} />
+          <CustomComponents.book_card :for={{dom_id, book} <- @streams.books} book={book} id={dom_id} />
         </div>
       <% end %>
     </Layouts.app>
@@ -74,30 +76,6 @@ defmodule AchaLivroWeb.HomeLive do
         <p class="text-sm text-base-content/70 mb-2">
           <div class="skeleton h-4 w-24"></div>
         </p>
-      </div>
-    </div>
-    """
-  end
-
-  def books_grid(assigns) do
-    ~H"""
-    <div
-      class="card bg-base-100 w-64 shadow-sm hover:shadow-md transition"
-      id={@id}
-      phx-mounted={JS.transition({"ease-out duration-600", "opacity-0", "opacity-100"}, time: 600)}
-      phx-remove={JS.transition({"ease-in duration-600", "opacity-100", "opacity-0"}, time: 600)}
-    >
-      <a href={@book.href} target="_blank" class="block">
-        <figure class="px-4 pt-4">
-          <img src={@book.image_url} alt="Livro" class="rounded-xl w-full h-80 object-cover" />
-        </figure>
-      </a>
-      <div class="card-body p-4">
-        <h2 class="card-title text-lg font-semibold line-clamp-2">{@book.title}</h2>
-        <div class="flex flex-row justify-center gap-4">
-          <img src={~p"/images/estante-virtual-logo.png"} width="50" />
-        </div>
-        <p class="text-sm text-base-content/70 mb-2">R$ {@book.price}</p>
       </div>
     </div>
     """
