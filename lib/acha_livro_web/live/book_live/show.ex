@@ -37,6 +37,15 @@ defmodule AchaLivroWeb.BookLive.Show do
                 <p class="text-sm md:text-base text-gray-600 dark:text-gray-400">
                   {@book.description}
                 </p>
+                <a
+                  href={@book.href}
+                  target="_blank"
+                  class="mt-4 flex justify-center"
+                >
+                  <button class="btn btn-wide ">
+                    <.icon name="hero-book-open" class="h-5 w-5 mr-2" /> abrir na Estante Virtual
+                  </button>
+                </a>
               </div>
             </div>
           </div>
