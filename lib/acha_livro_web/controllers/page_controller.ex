@@ -2,6 +2,6 @@ defmodule AchaLivroWeb.PageController do
   use AchaLivroWeb, :controller
 
   def home(conn, _params) do
-    render(conn, :home)
+    redirect(conn, to: ~p"/books")
   end
 end

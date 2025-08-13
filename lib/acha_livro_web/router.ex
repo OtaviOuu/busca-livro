@@ -18,15 +18,14 @@ defmodule AchaLivroWeb.Router do
     plug :accepts, ["json"]
   end
 
+  scope "/", AchaLivroWeb do
+    pipe_through :browser
+
+    get "/", PageController, :home
+  end
+
   scope "/books", AchaLivroWeb do
     pipe_through [:browser, :require_authenticated_user]
-
-    # live_session :for_admin, on_mount: [{AchaLivroWeb.UserAuth, :mount_current_scope}] do
-    #   live "/books", BookLive.Index, :index
-    #   live "/books/new", BookLive.Form, :new
-    #   live "/books/:id", BookLive.Show, :show
-    #   live "/books/:id/edit", BookLive.Form, :edit
-    # end
 
     live_session :default,
       on_mount: [{AchaLivroWeb.UserAuth, :mount_current_scope}] do
