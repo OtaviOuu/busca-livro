@@ -38,10 +38,10 @@ defmodule AchaLivroWeb.Layouts do
     ~H"""
     <header class="navbar px-4 sm:px-6 lg:px-8">
       <div class="flex-1">
-        <a href="/" class="flex-1 flex w-fit items-center gap-2">
+        <.link navigate={~p"/books"} class="flex-1 flex w-fit items-center gap-2">
           <img src={~p"/images/logo.svg"} width="36" />
           <span class="text-sm font-semibold">Acha Livro</span>
-        </a>
+        </.link>
       </div>
       <div class="flex-none">
         <ul class="flex flex-column px-1 space-x-4 items-center">
@@ -57,7 +57,7 @@ defmodule AchaLivroWeb.Layouts do
             </li>
             <div class="join">
               <li>
-                <.link class="btn" navigate={~p"/me"}>Me</.link>
+                <.link class="btn" navigate={~p"/books/me"}>Me</.link>
               </li>
               <li>
                 <.link class="btn" navigate={~p"/users/settings"}>Settings</.link>

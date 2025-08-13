@@ -1,69 +1,130 @@
 defmodule AchaLivroWeb.BookLive.Index do
   use AchaLivroWeb, :live_view
 
+  alias AchaLivro.Terms.Term
+  alias AchaLivro.Terms
   alias AchaLivro.Books
+  alias AchaLivro.Achados
+  alias AchaLivroWeb.CustomComponents
 
-  @impl true
+  @max_books 20
+
+  def mount(_params, _session, socket) do
+    if connected?(socket) do
+      send(self(), :load_books)
+
+      Books.subscribe_books()
+      Achados.subscribe_achados(socket.assigns.current_scope)
+    end
+
+    scope = socket.assigns.current_scope
+    term = %Term{user_id: scope.user.id}
+    term_changeset = Terms.change_term(scope, term)
+
+    socket =
+      socket
+      |> assign(:load_books, true)
+      |> assign(form: to_form(term_changeset))
+
+    {:ok, socket}
+  end
+
   def render(assigns) do
     ~H"""
     <Layouts.app flash={@flash} current_scope={@current_scope}>
-      <.header>
-        Listing Books
-        <:actions>
-          <.button variant="primary" navigate={~p"/books/new"}>
-            <.icon name="hero-plus" /> New Book
-          </.button>
-        </:actions>
-      </.header>
+      <%= if @load_books do %>
+        <div class="flex flex-row justify-center gap-6 flex-wrap p-4">
+          <CustomComponents.book_card_skeleton :for={_book <- 1..get_max_books()} />
+        </div>
+      <% else %>
+        <ul id="terms-list" class="flex flex-row flex-wrap gap-2 p-4" phx-update="stream">
+          <li :for={{dom_id, term} <- @streams.terms} id={dom_id}>
+            <span class="badge badge-primary">{term.value}</span>
+          </li>
+        </ul>
 
-      <.table
-        id="books"
-        rows={@streams.books}
-        row_click={fn {_id, book} -> JS.navigate(~p"/books/#{book}") end}
-      >
-        <:col :let={{_id, book}} label="Title">{book.title}</:col>
-        <:col :let={{_id, book}} label="Description">{book.description}</:col>
-        <:col :let={{_id, book}} label="Image url">{book.image_url}</:col>
-        <:col :let={{_id, book}} label="Price">{book.price}</:col>
-        <:col :let={{_id, book}} label="Code">{book.code}</:col>
-        <:action :let={{_id, book}}>
-          <div class="sr-only">
-            <.link navigate={~p"/books/#{book}"}>Show</.link>
-          </div>
-          <.link navigate={~p"/books/#{book}/edit"}>Edit</.link>
-        </:action>
-        <:action :let={{id, book}}>
-          <.link
-            phx-click={JS.push("delete", value: %{id: book.id}) |> hide("##{id}")}
-            data-confirm="Are you sure?"
-          >
-            Delete
-          </.link>
-        </:action>
-      </.table>
+        {@len_books} books found.
+        <.form for={@form} id="term-form" phx-submit="add_term" phx-change="change">
+          <.input field={@form[:value]} type="text" placeholder="Enter term" />
+          <.button class="btn btn-primary" phx-disable-with="Adding...">
+            Add Term
+          </.button>
+        </.form>
+        <div
+          class="flex flex-row justify-center gap-6 flex-wrap p-4"
+          phx-update="stream"
+          id="books-grid"
+        >
+          <CustomComponents.book_card :for={{dom_id, book} <- @streams.books} book={book} id={dom_id} />
+        </div>
+      <% end %>
     </Layouts.app>
     """
   end
 
-  @impl true
-  def mount(_params, _session, socket) do
-    {:ok,
-     socket
-     |> assign(:page_title, "Listing Books")
-     |> stream(:books, Books.list_books())}
+  def handle_event("add_term", %{"term" => %{"value" => term_value}}, socket) do
+    user_scope = socket.assigns.current_scope
+    term = %{user_id: user_scope.user.id, value: term_value}
+
+    case Terms.create_term(user_scope, term) do
+      {:ok, term} ->
+        changeset =
+          Terms.change_term(user_scope, %Term{user_id: user_scope.user.id}, %{value: ""})
+
+        socket =
+          socket
+          |> stream_insert(:terms, term, at: 0)
+          |> assign(form: to_form(changeset))
+
+        {:noreply, socket}
+
+      {:error, changeset} ->
+        {:noreply, assign(socket, :form, to_form(changeset))}
+    end
   end
 
-  @impl true
-  def handle_event("delete", %{"id" => id}, socket) do
-    book = Books.get_book!(id)
-    {:ok, _} = Books.delete_book(book)
+  def handle_event("change", params, socket) do
+    current_scope = socket.assigns.current_scope
 
-    {:noreply, stream_delete(socket, :books, book)}
+    changeset =
+      Terms.change_term(current_scope, %Term{user_id: current_scope.user.id}, params)
+
+    {:noreply, assign(socket, form: to_form(changeset))}
   end
 
-  @impl true
-  def handle_info({type, %AchaLivro.Books.Book{}}, socket)
-      when type in [:created, :updated, :deleted] do
-    {:noreply, stream(socket, :books, Books.list_books(), reset: true)}
+  def handle_info({:new_book, book}, socket) do
+    socket =
+      socket
+      # |> put_flash(:info, "New book added: #{book.title}")
+      |> assign(len_books: socket.assigns.len_books + 1)
+      |> stream_insert(:books, book, at: 0, limit: @max_books)
+
+    {:noreply, socket}
+  end
+
+  def handle_info({:created, achado}, socket) do
+    socket =
+      socket
+      |> put_flash(:info, "New book found: #{achado.book.title}")
+
+    {:noreply, socket}
+  end
+
+  def handle_info(:load_books, socket) do
+    books = Books.list_books(@max_books)
+    terms = Terms.list_terms(socket.assigns.current_scope)
+
+    socket =
+      socket
+      |> assign(:load_books, false)
+      |> assign(:len_books, Books.how_many_books())
+      |> stream(:books, books, limit: @max_books)
+      |> stream(:terms, terms)
+
+    {:noreply, socket}
+  end
+
+  def get_max_books do
+    @max_books
   end
 end

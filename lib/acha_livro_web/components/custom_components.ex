@@ -9,11 +9,11 @@ defmodule AchaLivroWeb.CustomComponents do
       phx-mounted={JS.transition({"ease-out duration-600", "opacity-0", "opacity-100"}, time: 600)}
       phx-remove={JS.transition({"ease-in duration-600", "opacity-100", "opacity-0"}, time: 600)}
     >
-      <a href={@book.href} target="_blank" class="block">
+      <.link navigate={~p"/books/#{@book.id}"} target="_blank" class="block">
         <figure class="px-4 pt-4">
           <img src={@book.image_url} alt="Livro" class="rounded-xl w-full h-80 object-cover" />
         </figure>
-      </a>
+      </.link>
       <div class="card-body p-4">
         <h2 class="card-title text-lg font-semibold line-clamp-2">{@book.title}</h2>
         <p class="h-40 overflow-y-auto p-4">

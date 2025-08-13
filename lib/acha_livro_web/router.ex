@@ -18,7 +18,7 @@ defmodule AchaLivroWeb.Router do
     plug :accepts, ["json"]
   end
 
-  scope "/", AchaLivroWeb do
+  scope "/books", AchaLivroWeb do
     pipe_through [:browser, :require_authenticated_user]
 
     # live_session :for_admin, on_mount: [{AchaLivroWeb.UserAuth, :mount_current_scope}] do
@@ -30,8 +30,10 @@ defmodule AchaLivroWeb.Router do
 
     live_session :default,
       on_mount: [{AchaLivroWeb.UserAuth, :mount_current_scope}] do
-      live "/", HomeLive, :index
+      live "/", BookLive.Index, :index, as: :books_index
+
       live "/me", MeLive, :index
+      live "/:id", BookLive.Show, :show
     end
   end
 
