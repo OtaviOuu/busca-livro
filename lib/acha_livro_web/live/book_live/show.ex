@@ -16,8 +16,32 @@ defmodule AchaLivroWeb.BookLive.Show do
   def render(assigns) do
     ~H"""
     <Layouts.app flash={@flash} current_scope={@current_scope}>
-      <h1>{@book.title}</h1>
-      <p>{@book.description}</p>
+      <div class="flex justify-center p-8">
+        <div class="card lg:card-side bg-base-100 shadow-xl max-w-7xl">
+          <figure class="p-4 md:p-8 lg:w-1/2">
+            <img
+              src={@book.image_url}
+              alt={@book.title}
+              class="w-full h-auto max-w-md mx-auto rounded-lg shadow-md object-cover"
+            />
+          </figure>
+          <div class="card-body p-4 md:p-8 lg:w-1/2">
+            <div class="flex flex-col gap-4">
+              <h1 class="card-title text-3xl md:text-4xl lg:text-5xl">
+                {@book.title}
+              </h1>
+              <p class="text-xl md:text-2xl font-semibold text-primary-focus">R$ {@book.price}</p>
+              <div class="divider"></div>
+              <div class="flex flex-col gap-2">
+                <h2 class="text-lg md:text-xl font-bold">Descrição</h2>
+                <p class="text-sm md:text-base text-gray-600 dark:text-gray-400">
+                  {@book.description}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </Layouts.app>
     """
   end
