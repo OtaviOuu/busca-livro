@@ -73,8 +73,6 @@ defmodule AchaLivro.Books do
 
   """
   def create_book(attrs) do
-    Process.sleep(5_000)
-
     with {:ok, book = %Book{}} <-
            %Book{}
            |> Book.changeset(attrs)
@@ -84,6 +82,13 @@ defmodule AchaLivro.Books do
 
       {:ok, book}
     end
+  end
+
+  def is_book_in_db?(attrs) do
+    Book
+    |> where([b], b.code == ^attrs.code)
+    |> Repo.exists?()
+    |> Kernel.not()
   end
 
   @doc """

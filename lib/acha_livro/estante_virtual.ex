@@ -13,6 +13,7 @@ defmodule AchaLivro.EstanteVirtual do
       |> parse_main_page_json()
       |> get_in(["SearchPage", "parentSkus"])
       |> Enum.map(&get_useful_book_data/1)
+      |> Enum.filter(&Books.is_book_in_db?/1)
       |> Enum.map(&Books.create_book/1)
 
     {:ok, new_books}
