@@ -16,6 +16,9 @@ defmodule AchaLivroWeb.CustomComponents do
       </a>
       <div class="card-body p-4">
         <h2 class="card-title text-lg font-semibold line-clamp-2">{@book.title}</h2>
+        <p class="h-40 overflow-y-auto p-4">
+          {@book.description}
+        </p>
         <div class="flex flex-row justify-center gap-4">
           <img src="/images/estante-virtual-logo.png" width="50" />
         </div>
