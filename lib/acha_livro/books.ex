@@ -5,8 +5,9 @@ defmodule AchaLivro.Books do
 
   import Ecto.Query, warn: false
   alias AchaLivro.Repo
-  alias AchaLivro.Notifier
   alias AchaLivro.Books.Book
+  alias AchaLivro.Accounts.Scope
+  alias AchaLivro.Achados
 
   def subscribe_books do
     Phoenix.PubSub.subscribe(AchaLivro.PubSub, "books")
@@ -60,6 +61,24 @@ defmodule AchaLivro.Books do
     Repo.get_by!(Book, id: id)
   end
 
+  def distribute_books_to_users({:ok, %Book{} = book}) do
+    terms =
+      AchaLivro.Terms.Term
+      |> preload(:user)
+      |> Repo.all()
+
+    for term <- terms do
+      user_scope = %Scope{user: term.user}
+
+      if String.contains?(book.title, term.value) do
+        {:ok, _achado} = Achados.create_achado(user_scope, %{book_id: book.id})
+        # AchaLivro.Achados.broadcast(user_scope, {:found_book, achado})
+      end
+    end
+
+    {:ok, book}
+  end
+
   @doc """
   Creates a book.
 
@@ -77,7 +96,7 @@ defmodule AchaLivro.Books do
            %Book{}
            |> Book.changeset(attrs)
            |> Repo.insert()
-           |> Notifier.call() do
+           |> distribute_books_to_users() do
       broadcast_books({:new_book, book})
 
       {:ok, book}
@@ -88,7 +107,6 @@ defmodule AchaLivro.Books do
     Book
     |> where([b], b.code == ^attrs.code)
     |> Repo.exists?()
-    |> Kernel.not()
   end
 
   @doc """
