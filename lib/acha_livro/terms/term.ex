@@ -15,6 +15,7 @@ defmodule AchaLivro.Terms.Term do
     term
     |> cast(attrs, [:value])
     |> validate_required([:value])
+    |> validate_length(:value, min: 3, max: 10)
     |> put_change(:user_id, user_scope.user.id)
   end
 end
