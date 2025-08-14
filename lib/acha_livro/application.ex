@@ -16,7 +16,8 @@ defmodule AchaLivro.Application do
       # Start a worker by calling: AchaLivro.Worker.start_link(arg)
       # {AchaLivro.Worker, arg},
       # Start to serve requests, typically the last entry
-      AchaLivroWeb.Endpoint
+      AchaLivroWeb.Endpoint,
+      AchaLivroWeb.Presence
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

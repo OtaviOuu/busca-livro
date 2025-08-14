@@ -6,24 +6,42 @@ defmodule AchaLivroWeb.BookLive.Index do
   alias AchaLivro.Books
   alias AchaLivro.Achados
   alias AchaLivroWeb.CustomComponents
+  alias AchaLivroWeb.Presence
 
   @max_books 20
 
   def mount(_params, _session, socket) do
+    topic = "books:index"
+
     if connected?(socket) do
       send(self(), :load_books)
 
       Books.subscribe_books()
       Achados.subscribe_achados(socket.assigns.current_scope)
+
+      Phoenix.PubSub.subscribe(AchaLivro.PubSub, topic)
+
+      scope = socket.assigns.current_scope
+
+      {:ok, _} =
+        Presence.track(self(), topic, scope.user.id, %{
+          user_id: scope.user.id,
+          joined_at: :os.system_time(:seconds)
+        })
     end
 
     scope = socket.assigns.current_scope
     term = %Term{user_id: scope.user.id}
     term_changeset = Terms.change_term(scope, term)
 
+    present_users = Presence.list(topic)
+    user_count = map_size(present_users)
+
     socket =
       socket
       |> assign(:load_books, true)
+      |> assign(:topic, topic)
+      |> assign(:user_count, user_count)
       |> assign(form: to_form(term_changeset))
 
     {:ok, socket}
@@ -32,6 +50,15 @@ defmodule AchaLivroWeb.BookLive.Index do
   def render(assigns) do
     ~H"""
     <Layouts.app flash={@flash} current_scope={@current_scope}>
+      <div class="fixed top-20 right-4 z-50">
+        <div class="badge badge-primary badge-lg gap-2 shadow-lg">
+          <.icon name="hero-users" class="h-4 w-4" />
+          <span class="font-medium">
+            {@user_count}
+          </span>
+        </div>
+      </div>
+
       <%= if @load_books do %>
         <div class="flex flex-row justify-center gap-6 flex-wrap p-4">
           <CustomComponents.book_card_skeleton :for={_book <- 1..get_max_books()} />
@@ -122,6 +149,14 @@ defmodule AchaLivroWeb.BookLive.Index do
       |> stream(:terms, terms)
 
     {:noreply, socket}
+  end
+
+  # Handle presence updates
+  def handle_info(%Phoenix.Socket.Broadcast{event: "presence_diff"}, socket) do
+    present_users = Presence.list(socket.assigns.topic)
+    user_count = map_size(present_users)
+
+    {:noreply, assign(socket, :user_count, user_count)}
   end
 
   def get_max_books do
