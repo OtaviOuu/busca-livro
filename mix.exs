@@ -65,7 +65,8 @@ defmodule AchaLivro.MixProject do
       {:oban, "~> 2.19"},
       {:oban_web, "~> 2.11"},
       {:igniter, "~> 0.5", only: [:dev]},
-      {:contex, "~> 0.5.0"}
+      {:contex, "~> 0.5.0"},
+      {:tidewave, "~> 0.2", only: :dev}
     ]
   end
 
