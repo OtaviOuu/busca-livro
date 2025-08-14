@@ -107,6 +107,7 @@ defmodule AchaLivro.Books do
     Book
     |> where([b], b.code == ^attrs.code)
     |> Repo.exists?()
+    |> Kernel.not()
   end
 
   @doc """
