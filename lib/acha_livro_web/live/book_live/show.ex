@@ -2,13 +2,29 @@ defmodule AchaLivroWeb.BookLive.Show do
   use AchaLivroWeb, :live_view
 
   alias AchaLivro.Books
+  alias AchaLivro.Achados
+  alias AchaLivro.Achados.Achado
+
+  def mount(_params, _session, socket) do
+    if connected?(socket) do
+      Achados.subscribe_achados(socket.assigns.current_scope)
+    end
+
+    {:ok, socket}
+  end
 
   def handle_params(%{"id" => id}, _url, socket) do
     book = Books.get_book!(id)
 
+    scope = socket.assigns.current_scope
+
     socket =
       socket
       |> assign(:book, book)
+      |> assign(
+        :is_book_from_current_user?,
+        Achados.book_is_from_the_user?(scope, id)
+      )
 
     {:noreply, socket}
   end
@@ -46,6 +62,15 @@ defmodule AchaLivroWeb.BookLive.Show do
                     <.icon name="hero-book-open" class="h-5 w-5 mr-2" /> abrir na Estante Virtual
                   </button>
                 </a>
+                <.link
+                  :if={@is_book_from_current_user?}
+                  phx-click="delete"
+                  class="mt-4 flex justify-center"
+                >
+                  <button class="btn btn-error btn-wide">
+                    <.icon name="hero-trash" class="h-5 w-5 mr-2" /> Deletar livro
+                  </button>
+                </.link>
               </div>
             </div>
           </div>
@@ -53,5 +78,24 @@ defmodule AchaLivroWeb.BookLive.Show do
       </div>
     </Layouts.app>
     """
+  end
+
+  def handle_event("delete", _, socket) do
+    current_scope = socket.assigns.current_scope
+
+    achado_to_delete = Achados.get_achado_by_book(current_scope, socket.assigns.book)
+
+    Achados.delete_achado(current_scope, achado_to_delete)
+
+    {:noreply, socket}
+  end
+
+  def handle_info({:deleted, %Achado{} = achado}, socket) do
+    socket =
+      socket
+      |> put_flash(:info, "Livro '#{achado.book.title}' deletado com sucesso.")
+      |> push_navigate(to: ~p"/books/me")
+
+    {:noreply, socket}
   end
 end

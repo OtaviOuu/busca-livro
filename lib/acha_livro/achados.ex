@@ -8,6 +8,7 @@ defmodule AchaLivro.Achados do
 
   alias AchaLivro.Achados.Achado
   alias AchaLivro.Accounts.Scope
+  alias AchaLivro.Books.Book
 
   @doc """
   Subscribes to scoped notifications about any achado changes.
@@ -53,7 +54,7 @@ defmodule AchaLivro.Achados do
     |> limit(^max)
     |> where(user_id: ^scope.user.id)
     |> preload(:book)
-    |> order_by(desc: :inserted_at)
+    |> order_by(desc: :book_id)
     |> Repo.all()
   end
 
@@ -73,6 +74,10 @@ defmodule AchaLivro.Achados do
   """
   def get_achado!(%Scope{} = scope, id) do
     Repo.get_by!(Achado, id: id, user_id: scope.user.id)
+  end
+
+  def get_achado_by_book(%Scope{} = scope, %Book{} = book) do
+    Repo.get_by!(Achado, book_id: book.id, user_id: scope.user.id)
   end
 
   @doc """
@@ -139,9 +144,14 @@ defmodule AchaLivro.Achados do
 
     with {:ok, achado = %Achado{}} <-
            Repo.delete(achado) do
-      broadcast(scope, {:deleted, achado})
+      broadcast(scope, {:deleted, achado |> Repo.preload(:book)})
       {:ok, achado}
     end
+  end
+
+  def book_is_from_the_user?(%Scope{} = scope, book_id) do
+    book = Repo.get_by(Achado, book_id: book_id, user_id: scope.user.id)
+    book != nil
   end
 
   @doc """
