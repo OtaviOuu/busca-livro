@@ -2,8 +2,10 @@ defmodule AchaLivro.Shopee do
   alias AchaLivro.HttpClient
   alias AchaLivro.Books
 
+  @shopee_api_url "http://localhost:8000/"
+
   def scrape_new_books do
-    {_, books} = HttpClient.get("http://localhost:8000/")
+    {_, books} = HttpClient.get(@shopee_api_url)
     IO.inspect(books, label: "Books Shopee")
 
     books
