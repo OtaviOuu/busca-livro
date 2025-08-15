@@ -5,8 +5,9 @@ defmodule AchaLivro.EstanteVirtual do
 
   # fazer async talvez n sei
   def scrape_new_books do
+    # /ciencias-exatas?sort=new-releases&tipo-de-livro=usado
     {:ok, response} =
-      HttpClient.get(@base_url <> "/ciencias-exatas?sort=new-releases&tipo-de-livro=usado")
+      HttpClient.get(@base_url <> "/ciencias-exatas?sort=new-releases")
 
     new_books =
       response
