@@ -7,7 +7,7 @@ defmodule AchaLivroWeb.BookLive.Index do
   alias AchaLivro.Achados
   alias AchaLivroWeb.CustomComponents
 
-  @max_books 20
+  @max_books 200
 
   def mount(_params, _session, socket) do
     connected? = connected?(socket)

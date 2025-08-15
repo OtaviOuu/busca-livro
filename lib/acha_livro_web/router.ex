@@ -25,16 +25,16 @@ defmodule AchaLivroWeb.Router do
       on_mount: {AchaLivroWeb.UserAuth, :mount_current_scope} do
       live "/", BookLive.Index, :index
       live "/books", BookLive.Index, :index
+      live "/books/:id", BookLive.Show, :show
     end
   end
 
-  scope "/books", AchaLivroWeb do
+  scope "/users", AchaLivroWeb do
     pipe_through [:browser, :require_authenticated_user]
 
     live_session :default,
       on_mount: [{AchaLivroWeb.UserAuth, :mount_current_scope}] do
       live "/me", MeLive, :index
-      live "/:id", BookLive.Show, :show
     end
   end
 

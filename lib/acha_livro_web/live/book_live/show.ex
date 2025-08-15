@@ -6,27 +6,33 @@ defmodule AchaLivroWeb.BookLive.Show do
   alias AchaLivro.Achados.Achado
 
   def mount(_params, _session, socket) do
-    if connected?(socket) do
-      Achados.subscribe_achados(socket.assigns.current_scope)
-    end
-
     {:ok, socket}
   end
 
   def handle_params(%{"id" => id}, _url, socket) do
-    book = Books.get_book!(id)
-
     scope = socket.assigns.current_scope
 
-    socket =
-      socket
-      |> assign(:book, book)
-      |> assign(
-        :is_book_from_current_user?,
-        Achados.book_is_from_the_user?(scope, id)
-      )
+    book = Books.get_book!(id)
+    socket = assign(socket, :book, book)
 
-    {:noreply, socket}
+    case scope do
+      %{user: user} when not is_nil(user) ->
+        if connected?(socket) do
+          Achados.subscribe_achados(scope)
+        end
+
+        is_book_from_current_user? = Achados.book_is_from_the_user?(scope, id)
+
+        socket =
+          socket
+          |> assign(:is_book_from_current_user?, is_book_from_current_user?)
+
+        {:noreply, socket}
+
+      _ ->
+        socket = assign(socket, :is_book_from_current_user?, false)
+        {:noreply, socket}
+    end
   end
 
   def render(assigns) do
@@ -94,7 +100,7 @@ defmodule AchaLivroWeb.BookLive.Show do
     socket =
       socket
       |> put_flash(:info, "Livro '#{achado.book.title}' deletado com sucesso.")
-      |> push_navigate(to: ~p"/books/me")
+      |> push_navigate(to: ~p"/users/me")
 
     {:noreply, socket}
   end

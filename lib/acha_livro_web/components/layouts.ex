@@ -57,7 +57,7 @@ defmodule AchaLivroWeb.Layouts do
             </li>
             <div class="join">
               <li>
-                <.link class="btn" navigate={~p"/books/me"}>Me</.link>
+                <.link class="btn" navigate={~p"/users/me"}>Me</.link>
               </li>
               <li>
                 <.link class="btn" navigate={~p"/users/settings"}>Settings</.link>
