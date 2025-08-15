@@ -4,3 +4,4 @@ alias AchaLivro.Terms
 alias AchaLivro.Terms.Term
 alias AchaLivro.HttpClient
 alias AchaLivro.EstanteVirtual
+alias AchaLivro.Shopee

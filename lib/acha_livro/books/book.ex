@@ -4,10 +4,10 @@ defmodule AchaLivro.Books.Book do
 
   schema "books" do
     field :title, :string
-    field :description, :string
-    field :image_url, :string
-    field :price, :decimal
-    field :code, :string
+    field :description, :string, default: "Sem descrição"
+    field :image_url, :string, default: ""
+    field :price, :decimal, default: 0.0
+    field :code, :string, default: ""
     field :href, :string, default: ""
     timestamps(type: :utc_datetime)
   end
@@ -16,6 +16,6 @@ defmodule AchaLivro.Books.Book do
   def changeset(book, attrs) do
     book
     |> cast(attrs, [:title, :description, :image_url, :price, :code, :href])
-    |> validate_required([:title, :description, :image_url, :price, :code, :href])
+    |> validate_required([:title, :image_url])
   end
 end
