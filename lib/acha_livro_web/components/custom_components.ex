@@ -42,4 +42,26 @@ defmodule AchaLivroWeb.CustomComponents do
     </div>
     """
   end
+
+  attr :form, :any, doc: "The form to be rendered in the term form component"
+  attr :streams, :map, doc: "Streams for terms"
+
+  def term_form(assigns) do
+    ~H"""
+    <section>
+      <ul id="terms-list" class="flex flex-row flex-wrap gap-2 p-4" phx-update="stream">
+        <li :for={{dom_id, term} <- @streams.terms} id={dom_id}>
+          <span class="badge badge-primary">{term.value}</span>
+        </li>
+      </ul>
+
+      <.form for={@form} id="term-form" phx-submit="add_term" phx-change="change">
+        <.input field={@form[:value]} type="text" placeholder="Enter term" />
+        <.button class="btn btn-primary" phx-disable-with="Adding...">
+          Add Term
+        </.button>
+      </.form>
+    </section>
+    """
+  end
 end

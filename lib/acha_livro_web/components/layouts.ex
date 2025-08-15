@@ -63,7 +63,7 @@ defmodule AchaLivroWeb.Layouts do
                 <.link class="btn" navigate={~p"/users/settings"}>Settings</.link>
               </li>
               <li>
-                <.link class="btn" navigate={~p"/users/log-out"} method="delete">Log out</.link>
+                <.link class="btn" href={~p"/users/log-out"} method="delete">Log out</.link>
               </li>
             </div>
           <% else %>

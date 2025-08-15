@@ -6,77 +6,61 @@ defmodule AchaLivroWeb.BookLive.Index do
   alias AchaLivro.Books
   alias AchaLivro.Achados
   alias AchaLivroWeb.CustomComponents
-  alias AchaLivroWeb.Presence
 
   @max_books 20
 
   def mount(_params, _session, socket) do
-    topic = "books:index"
+    connected? = connected?(socket)
+    scope = socket.assigns.current_scope
 
-    if connected?(socket) do
-      send(self(), :load_books)
+    if connected? do
+      send(self(), :loading_books)
 
       Books.subscribe_books()
-      Achados.subscribe_achados(socket.assigns.current_scope)
-
-      Phoenix.PubSub.subscribe(AchaLivro.PubSub, topic)
-
-      scope = socket.assigns.current_scope
-
-      {:ok, _} =
-        Presence.track(self(), topic, scope.user.id, %{
-          user_id: scope.user.id,
-          joined_at: :os.system_time(:seconds)
-        })
     end
 
-    scope = socket.assigns.current_scope
-    term = %Term{user_id: scope.user.id}
-    term_changeset = Terms.change_term(scope, term)
+    case scope do
+      %{user: user} when not is_nil(user) ->
+        if connected? do
+          Achados.subscribe_achados(scope)
+          send(self(), :load_terms)
+        end
 
-    present_users = Presence.list(topic)
-    user_count = map_size(present_users)
+        term = %Term{user_id: scope.user.id}
+        term_changeset = Terms.change_term(scope, term)
 
-    socket =
-      socket
-      |> assign(:load_books, true)
-      |> assign(:topic, topic)
-      |> assign(:user_count, user_count)
-      |> assign(form: to_form(term_changeset))
+        socket =
+          socket
+          |> assign(form: to_form(term_changeset))
+          |> assign(:loading_books, true)
+          |> assign(:loading_terms, true)
+          |> assign(:loged, true)
 
-    {:ok, socket}
+        {:ok, socket}
+
+      _ ->
+        socket =
+          socket
+          |> assign(:loading_books, true)
+          |> assign(:loged, false)
+
+        {:ok, socket}
+    end
   end
 
   def render(assigns) do
     ~H"""
     <Layouts.app flash={@flash} current_scope={@current_scope}>
-      <div class="fixed top-20 right-4 z-50">
-        <div class="badge badge-primary badge-lg gap-2 shadow-lg">
-          <.icon name="hero-users" class="h-4 w-4" />
-          <span class="font-medium">
-            {@user_count}
-          </span>
-        </div>
-      </div>
-
-      <%= if @load_books do %>
+      <%= if @loading_books do %>
         <div class="flex flex-row justify-center gap-6 flex-wrap p-4">
           <CustomComponents.book_card_skeleton :for={_book <- 1..get_max_books()} />
         </div>
       <% else %>
-        <ul id="terms-list" class="flex flex-row flex-wrap gap-2 p-4" phx-update="stream">
-          <li :for={{dom_id, term} <- @streams.terms} id={dom_id}>
-            <span class="badge badge-primary">{term.value}</span>
-          </li>
-        </ul>
-
-        {@len_books} books found.
-        <.form for={@form} id="term-form" phx-submit="add_term" phx-change="change">
-          <.input field={@form[:value]} type="text" placeholder="Enter term" />
-          <.button class="btn btn-primary" phx-disable-with="Adding...">
-            Add Term
-          </.button>
-        </.form>
+        <CustomComponents.term_form
+          :if={@loged && not @loading_terms}
+          streams={@streams}
+          form={@form}
+        />
         <div
           class="flex flex-row justify-center gap-6 flex-wrap p-4"
           phx-update="stream"
@@ -137,26 +121,30 @@ defmodule AchaLivroWeb.BookLive.Index do
     {:noreply, socket}
   end
 
-  def handle_info(:load_books, socket) do
-    books = Books.list_books(@max_books)
+  def handle_info(:load_terms, socket) do
     terms = Terms.list_terms(socket.assigns.current_scope)
 
     socket =
       socket
-      |> assign(:load_books, false)
-      |> assign(:len_books, Books.how_many_books())
-      |> stream(:books, books, limit: @max_books)
       |> stream(:terms, terms)
+      |> assign(:loading_terms, false)
 
     {:noreply, socket}
   end
 
-  # Handle presence updates
-  def handle_info(%Phoenix.Socket.Broadcast{event: "presence_diff"}, socket) do
-    present_users = Presence.list(socket.assigns.topic)
-    user_count = map_size(present_users)
+  def handle_info(:loading_books, socket) do
+    books = Books.list_books(@max_books)
+    # terms = Terms.list_terms(socket.assigns.current_scope)
 
-    {:noreply, assign(socket, :user_count, user_count)}
+    socket =
+      socket
+      |> assign(:len_books, Books.how_many_books())
+      |> stream(:books, books, limit: @max_books)
+      |> assign(:loading_books, false)
+
+    # |> stream(:terms, terms)
+
+    {:noreply, socket}
   end
 
   def get_max_books do

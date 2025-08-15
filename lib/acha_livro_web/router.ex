@@ -21,7 +21,11 @@ defmodule AchaLivroWeb.Router do
   scope "/", AchaLivroWeb do
     pipe_through :browser
 
-    get "/", PageController, :home
+    live_session :books,
+      on_mount: {AchaLivroWeb.UserAuth, :mount_current_scope} do
+      live "/", BookLive.Index, :index
+      live "/books", BookLive.Index, :index
+    end
   end
 
   scope "/books", AchaLivroWeb do
@@ -29,8 +33,6 @@ defmodule AchaLivroWeb.Router do
 
     live_session :default,
       on_mount: [{AchaLivroWeb.UserAuth, :mount_current_scope}] do
-      live "/", BookLive.Index, :index, as: :books_index
-
       live "/me", MeLive, :index
       live "/:id", BookLive.Show, :show
     end
