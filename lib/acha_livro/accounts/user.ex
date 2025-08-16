@@ -30,6 +30,22 @@ defmodule AchaLivro.Accounts.User do
     |> validate_email(opts)
   end
 
+  @doc """
+  A user changeset for registration.
+
+  It is important to validate the length of both email and password.
+  Otherwise databases may truncate the email without warnings, which
+  could lead to unpredictable or insecure behaviour. Long passwords may
+  also be very expensive to hash for certain algorithms.
+  """
+  def registration_changeset(user, attrs, opts \\ []) do
+    user
+    |> cast(attrs, [:email, :password])
+    |> validate_email(opts)
+    |> validate_password(opts)
+    |> put_change(:confirmed_at, DateTime.utc_now(:second))
+  end
+
   defp validate_email(changeset, opts) do
     changeset =
       changeset
