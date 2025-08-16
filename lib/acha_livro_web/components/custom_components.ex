@@ -24,9 +24,13 @@ defmodule AchaLivroWeb.CustomComponents do
         <h2 class="text-sm font-medium line-clamp-2 min-h-[2.5rem]">
           {@book.title}
         </h2>
-        <h3 :if={@book.clicks > 0} class="text-sm font-medium line-clamp-2 min-h-[2.5rem]">
-          {@book.clicks}
+        <h3
+          :if={@book.clicks > 0}
+          class="text-sm md:text-base font-medium text-gray-500 dark:text-gray-400 line-clamp-1 min-h-[1.5rem]"
+        >
+          🔥 {@book.clicks} clique{if @book.clicks > 1, do: "s", else: ""}
         </h3>
+
         <div class="flex justify-between items-center">
           <span class="badge badge-sm">
             <img src="/images/estante-virtual-logo.png" class="h-4" />
