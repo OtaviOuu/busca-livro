@@ -4,7 +4,7 @@ defmodule AchaLivro.Workers.Shopee do
   alias AchaLivro.Shopee
   @impl Oban.Worker
   def perform(_job) do
-    Shopee.scrape_new_books()
+    # Shopee.scrape_new_books()
     :ok
   end
 end
