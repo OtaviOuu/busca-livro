@@ -4,22 +4,30 @@ defmodule AchaLivroWeb.CustomComponents do
   def book_card(assigns) do
     ~H"""
     <div
-      class="card bg-base-100 w-64 shadow-sm hover:shadow-md transition"
+      class="card bg-base-100 w-60 shadow hover:shadow-lg transition rounded-xl overflow-hidden"
       id={@id}
-      phx-mounted={JS.transition({"ease-out duration-600", "opacity-0", "opacity-100"}, time: 600)}
-      phx-remove={JS.transition({"ease-in duration-600", "opacity-100", "opacity-0"}, time: 600)}
+      phx-mounted={JS.transition({"ease-out duration-500", "opacity-0", "opacity-100"}, time: 500)}
+      phx-remove={JS.transition({"ease-in duration-500", "opacity-100", "opacity-0"}, time: 500)}
     >
       <.link navigate={~p"/books/#{@book.id}"} target="_blank" class="block">
-        <figure class="px-4 pt-4">
-          <img src={@book.image_url} alt="Livro" class="rounded-xl w-full h-80 object-cover" />
+        <figure class="aspect-[3/4] bg-base-200">
+          <img src={@book.image_url} alt={@book.title} class="w-full h-full object-cover" />
         </figure>
       </.link>
-      <div class="card-body p-4">
-        <h2 class="card-title text-lg font-semibold line-clamp-2">{@book.title}</h2>
-        <div class="flex flex-row justify-center gap-4">
-          <img src="/images/estante-virtual-logo.png" width="50" />
+
+      <div class="p-3 flex flex-col gap-2">
+        <h2 class="text-sm font-medium line-clamp-2 min-h-[2.5rem]">
+          {@book.title}
+        </h2>
+
+        <div class="flex justify-between items-center">
+          <span class="badge badge-sm">
+            <img src="/images/estante-virtual-logo.png" class="h-4" />
+          </span>
+          <span class="text-lg font-bold text-primary-focus">
+            R$ {@book.price}
+          </span>
         </div>
-        <p class="text-sm text-base-content/70 mb-2">R$ {@book.price}</p>
       </div>
     </div>
     """

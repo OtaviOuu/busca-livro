@@ -38,46 +38,47 @@ defmodule AchaLivroWeb.BookLive.Show do
   def render(assigns) do
     ~H"""
     <Layouts.app flash={@flash} current_scope={@current_scope}>
-      <div class="flex justify-center p-8">
-        <div class="card lg:card-side bg-base-100 shadow-xl max-w-7xl">
-          <figure class="p-4 md:p-8 lg:w-1/2">
+      <div class="flex justify-center p-6 md:p-10">
+        <div class="card lg:card-side bg-base-100 shadow-xl hover:shadow-2xl transition max-w-7xl rounded-2xl overflow-hidden">
+          <figure class="bg-base-200 flex items-center justify-center p-4 md:p-8 lg:w-1/2">
             <img
               src={@book.image_url}
               alt={@book.title}
-              class="w-full h-auto max-w-md mx-auto rounded-lg shadow-md object-cover"
+              class="w-full h-auto max-w-md mx-auto rounded-lg shadow-lg object-cover"
             />
           </figure>
-          <div class="card-body p-4 md:p-8 lg:w-1/2">
+
+          <div class="card-body p-5 md:p-8 lg:w-1/2 flex flex-col justify-between">
             <div class="flex flex-col gap-4">
-              <h1 class="card-title text-3xl md:text-4xl lg:text-5xl">
+              <h1 class="text-2xl md:text-3xl lg:text-4xl font-bold leading-snug">
                 {@book.title}
               </h1>
-              <p class="text-xl md:text-2xl font-semibold text-primary-focus">R$ {@book.price}</p>
+
+              <p class="text-2xl font-extrabold text-primary bg-primary/10 px-4 py-2 rounded-lg w-fit shadow-sm">
+                R$ {@book.price}
+              </p>
+
               <div class="divider"></div>
+
               <div class="flex flex-col gap-2">
                 <h2 class="text-lg md:text-xl font-bold">Descrição</h2>
-                <p class="text-sm md:text-base text-gray-600 dark:text-gray-400">
+                <p class="text-sm md:text-base text-gray-600 dark:text-gray-400 leading-relaxed">
                   {@book.description}
                 </p>
-                <a
-                  href={@book.href}
-                  target="_blank"
-                  class="mt-4 flex justify-center"
-                >
-                  <button class="btn btn-wide ">
-                    <.icon name="hero-book-open" class="h-5 w-5 mr-2" /> abrir na Estante Virtual
-                  </button>
-                </a>
-                <.link
-                  :if={@is_book_from_current_user?}
-                  phx-click="delete"
-                  class="mt-4 flex justify-center"
-                >
-                  <button class="btn btn-error btn-wide">
-                    <.icon name="hero-trash" class="h-5 w-5 mr-2" /> Deletar livro
-                  </button>
-                </.link>
               </div>
+            </div>
+
+            <div class="flex flex-col gap-3 mt-6">
+              <a href={@book.href} target="_blank" class="flex justify-center">
+                <button class="btn btn-primary btn-wide">
+                  <.icon name="hero-book-open" class="h-5 w-5 mr-2" /> Abrir na Estante Virtual
+                </button>
+              </a>
+              <.link :if={@is_book_from_current_user?} phx-click="delete" class="flex justify-center">
+                <button class="btn btn-error btn-wide">
+                  <.icon name="hero-trash" class="h-5 w-5 mr-2" /> Deletar livro
+                </button>
+              </.link>
             </div>
           </div>
         </div>
