@@ -7,7 +7,7 @@ defmodule AchaLivro.EstanteVirtual do
   def scrape_new_books do
     # /ciencias-exatas?sort=new-releases&tipo-de-livro=usado
     {:ok, response} =
-      HttpClient.get(@base_url <> "/ciencias-exatas?sort=new-releases")
+      HttpClient.get(@base_url <> "/ciencias-exatas?sort=new-releases&tipo-de-livro=usado")
 
     new_books =
       response
