@@ -52,6 +52,7 @@ config :acha_livro, AchaLivroWeb.Endpoint,
 #
 # For production it's recommended to configure a different adapter
 # at the `config/runtime.exs`.
+config :acha_livro, AchaLivro.Mailer, adapter: Swoosh.Adapters.Local
 
 # Configure esbuild (the version is required)
 config :esbuild,

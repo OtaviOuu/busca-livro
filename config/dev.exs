@@ -86,5 +86,3 @@ config :phoenix_live_view,
 
 # Disable swoosh api client as it is only required for production adapters.
 config :swoosh, :api_client, false
-
-config :acha_livro, AchaLivro.Mailer, adapter: Swoosh.Adapters.Local
