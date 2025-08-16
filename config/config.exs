@@ -22,11 +22,12 @@ config :acha_livro, :scopes,
 
 config :acha_livro, Oban,
   repo: AchaLivro.Repo,
-  queues: [estante_virtual: 10],
+  queues: [estante_virtual: 10, shopee: 10],
   plugins: [
     {Oban.Plugins.Cron,
      crontab: [
-       {"* * * * *", AchaLivro.Workers.EstanteVirtual}
+       {"* * * * *", AchaLivro.Workers.EstanteVirtual},
+       {"* * * * *", AchaLivro.Workers.Shopee}
      ]}
   ]
 
