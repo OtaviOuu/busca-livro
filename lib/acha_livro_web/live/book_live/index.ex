@@ -94,13 +94,24 @@ defmodule AchaLivroWeb.BookLive.Index do
     end
   end
 
-  def handle_event("change", params, socket) do
-    current_scope = socket.assigns.current_scope
+  def handle_event("track_click", %{"id" => id, "url" => url}, socket) do
+    book = Books.get_book!(id)
 
-    changeset =
-      Terms.change_term(current_scope, %Term{user_id: current_scope.user.id}, params)
+    Books.update_book(book, %{clicks: book.clicks + 1})
 
-    {:noreply, assign(socket, form: to_form(changeset))}
+    socket =
+      socket
+      |> push_navigate(to: url)
+
+    {:noreply, socket}
+  end
+
+  def handle_info({:book_updated, new_book_state}, socket) do
+    socket =
+      socket
+      |> stream_insert(:books, new_book_state)
+
+    {:noreply, socket}
   end
 
   def handle_info({:new_book, book}, socket) do

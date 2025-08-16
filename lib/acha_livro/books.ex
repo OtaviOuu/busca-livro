@@ -127,6 +127,8 @@ defmodule AchaLivro.Books do
            book
            |> Book.changeset(attrs)
            |> Repo.update() do
+      broadcast_books({:book_updated, book})
+
       {:ok, book}
     end
   end

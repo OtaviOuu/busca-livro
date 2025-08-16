@@ -9,7 +9,12 @@ defmodule AchaLivroWeb.CustomComponents do
       phx-mounted={JS.transition({"ease-out duration-500", "opacity-0", "opacity-100"}, time: 500)}
       phx-remove={JS.transition({"ease-in duration-500", "opacity-100", "opacity-0"}, time: 500)}
     >
-      <.link navigate={~p"/books/#{@book.id}"} target="_blank" class="block">
+      <.link
+        class="block"
+        phx-click="track_click"
+        phx-value-id={@book.id}
+        phx-value-url={~p"/books/#{@book.id}"}
+      >
         <figure class="aspect-[3/4] bg-base-200">
           <img src={@book.image_url} alt={@book.title} class="w-full h-full object-cover" />
         </figure>
@@ -19,7 +24,9 @@ defmodule AchaLivroWeb.CustomComponents do
         <h2 class="text-sm font-medium line-clamp-2 min-h-[2.5rem]">
           {@book.title}
         </h2>
-
+        <h3 :if={@book.clicks > 0} class="text-sm font-medium line-clamp-2 min-h-[2.5rem]">
+          {@book.clicks}
+        </h3>
         <div class="flex justify-between items-center">
           <span class="badge badge-sm">
             <img src="/images/estante-virtual-logo.png" class="h-4" />
