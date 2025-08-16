@@ -62,7 +62,7 @@ defmodule AchaLivroWeb.BookLive.Show do
 
               <div class="flex flex-col gap-2">
                 <h2 class="text-lg md:text-xl font-bold">Descrição</h2>
-                <p class="text-sm md:text-base text-gray-600 dark:text-gray-400 leading-relaxed">
+                <p class="text-sm md:text-base text-base-content leading-relaxed">
                   {@book.description}
                 </p>
               </div>
