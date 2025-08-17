@@ -106,6 +106,15 @@ defmodule AchaLivroWeb.BookLive.Index do
     {:noreply, socket}
   end
 
+  def handle_event("change", params, socket) do
+    current_scope = socket.assigns.current_scope
+
+    changeset =
+      Terms.change_term(current_scope, %Term{user_id: current_scope.user.id}, params)
+
+    {:noreply, assign(socket, form: to_form(changeset))}
+  end
+
   def handle_info({:book_updated, new_book_state}, socket) do
     socket =
       socket
