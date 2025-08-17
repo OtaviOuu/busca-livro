@@ -74,17 +74,32 @@ defmodule AchaLivroWeb.CustomComponents do
 
   def term_form(assigns) do
     ~H"""
-    <section>
-      <ul id="terms-list" class="flex flex-row flex-wrap gap-2 p-4" phx-update="stream">
-        <li :for={{dom_id, term} <- @streams.terms} id={dom_id}>
-          <span class="badge badge-primary">{term.value}</span>
+    <section class="max-w-3xl mx-auto p-6 bg-white dark:bg-gray-900 rounded-3xl shadow-lg border border-gray-200 dark:border-gray-700">
+      <h2 class="text-2xl font-extrabold mb-6 text-center text-gray-800 dark:text-gray-100">
+        Termos
+      </h2>
+
+      <ul id="terms-list" class="flex flex-wrap gap-4 mb-6" phx-update="stream">
+        <li
+          :for={{dom_id, term} <- @streams.terms}
+          id={dom_id}
+          class="transition-transform hover:scale-105"
+        >
+          <span class="badge badge-lg badge-primary font-medium px-4 py-2 shadow-md">
+            {term.value}
+          </span>
         </li>
       </ul>
 
-      <.form for={@form} id="term-form" phx-submit="add_term" phx-change="change">
-        <.input field={@form[:value]} type="text" placeholder="Enter term" />
-        <.button class="btn btn-primary" phx-disable-with="Adding...">
-          Add Term
+      <.form for={@form} id="term-form" phx-submit="add_term" phx-change="change" class="flex gap-3">
+        <.input
+          field={@form[:value]}
+          type="text"
+          placeholder="Enter new term"
+          class="input input-bordered input-lg flex-1 shadow-sm focus:ring-2 focus:ring-primary focus:border-primary transition"
+        />
+        <.button class="btn btn-primary btn-lg shadow-lg" phx-disable-with="Adding...">
+          Add
         </.button>
       </.form>
     </section>
