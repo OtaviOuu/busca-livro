@@ -3,7 +3,7 @@ defmodule AchaLivroWeb.MeLive do
 
   alias AchaLivro.Achados
   alias AchaLivroWeb.CustomComponents
-
+  alias AchaLivro.Books
   @max_achados 20
 
   def mount(_params, _session, socket) do
@@ -61,6 +61,18 @@ defmodule AchaLivroWeb.MeLive do
       socket
       |> update(:loading_books, fn _ -> false end)
       |> stream(:achados, achados, limit: @max_achados)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("track_click", %{"id" => id, "url" => url}, socket) do
+    book = Books.get_book!(id)
+
+    Books.update_book(book, %{clicks: book.clicks + 1})
+
+    socket =
+      socket
+      |> push_navigate(to: url)
 
     {:noreply, socket}
   end

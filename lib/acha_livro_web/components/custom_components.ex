@@ -4,7 +4,7 @@ defmodule AchaLivroWeb.CustomComponents do
   def book_card(assigns) do
     ~H"""
     <div
-      class="card bg-base-100 w-60 shadow hover:shadow-lg transition rounded-xl overflow-hidden"
+      class="card bg-base-100 w-64 shadow-md hover:shadow-xl transition duration-300 rounded-2xl overflow-hidden border border-base-200"
       id={@id}
       phx-mounted={JS.transition({"ease-out duration-500", "opacity-0", "opacity-100"}, time: 500)}
       phx-remove={JS.transition({"ease-in duration-500", "opacity-100", "opacity-0"}, time: 500)}
@@ -16,26 +16,33 @@ defmodule AchaLivroWeb.CustomComponents do
         phx-value-url={~p"/books/#{@book.id}"}
       >
         <figure class="aspect-[3/4] bg-base-200">
-          <img src={@book.image_url} alt={@book.title} class="w-full h-full object-cover" />
+          <img
+            src={@book.image_url}
+            alt={@book.title}
+            class="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+          />
         </figure>
       </.link>
 
-      <div class="p-3 flex flex-col gap-2">
-        <h2 class="text-sm font-medium line-clamp-2 min-h-[2.5rem]">
+      <div class="card-body p-4 gap-3">
+        <h2 class="card-title text-base font-semibold line-clamp-2 min-h-[2.5rem]">
           {@book.title}
         </h2>
+
         <h3
           :if={@book.clicks > 0}
-          class="text-sm md:text-base font-medium text-gray-500 dark:text-gray-400 line-clamp-1 min-h-[1.5rem]"
+          class="text-sm font-medium text-gray-500 dark:text-gray-400 flex items-center gap-1"
         >
-          🔥 {@book.clicks} clique{if @book.clicks > 1, do: "s", else: ""}
+          <span class="animate-bounce">🔥</span> {@book.clicks} clique{if @book.clicks > 1,
+            do: "s",
+            else: ""}
         </h3>
 
-        <div class="flex justify-between items-center">
-          <span class="badge badge-sm">
-            <img src="/images/estante-virtual-logo.png" class="h-4" />
+        <div class="flex justify-between items-center mt-auto">
+          <span class="badge badge-outline badge-sm flex items-center gap-1">
+            <img src="/images/estante-virtual-logo.png" class="h-4" /> Estante
           </span>
-          <span class="text-lg font-bold text-primary-focus">
+          <span class="text-lg font-bold text-primary">
             R$ {@book.price}
           </span>
         </div>
