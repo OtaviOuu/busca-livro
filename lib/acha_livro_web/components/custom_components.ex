@@ -76,7 +76,7 @@ defmodule AchaLivroWeb.CustomComponents do
     ~H"""
     <section class="max-w-3xl mx-auto p-6 bg-white dark:bg-gray-900 rounded-3xl shadow-lg border border-gray-200 dark:border-gray-700">
       <h2 class="text-2xl font-extrabold mb-6 text-center text-gray-800 dark:text-gray-100">
-        Termos
+        Termos de busca
       </h2>
 
       <ul id="terms-list" class="flex flex-wrap gap-4 mb-6" phx-update="stream">
@@ -105,6 +105,18 @@ defmodule AchaLivroWeb.CustomComponents do
         </.button>
       </.form>
     </section>
+    """
+  end
+
+  def banner(assigns) do
+    ~H"""
+    <div class="hero bg-base-200 rounded-xl shadow-md my-4">
+      <div class="hero-content text-center">
+        <div class="max-w-md">
+          {render_slot(@inner_block)}
+        </div>
+      </div>
+    </div>
     """
   end
 end

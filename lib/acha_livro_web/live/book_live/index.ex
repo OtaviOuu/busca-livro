@@ -56,6 +56,14 @@ defmodule AchaLivroWeb.BookLive.Index do
           <CustomComponents.book_card_skeleton :for={_book <- 1..get_max_books()} />
         </div>
       <% else %>
+        <CustomComponents.banner :if={!@loged}>
+          <h1 class="text-3xl font-bold">
+            📚 Bem-vindo ao Achados
+          </h1>
+          <p class="py-4 text-base">
+            Faça login para cadastrar termos de busca e monitorar a postagem de livros
+          </p>
+        </CustomComponents.banner>
         <CustomComponents.term_form
           :if={@loged && not @loading_terms}
           streams={@streams}
