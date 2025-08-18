@@ -81,6 +81,13 @@ defmodule AchaLivroWeb.BookLive.Index do
     """
   end
 
+  def handle_event("delete_term", %{"id" => id}, socket) do
+    scope = socket.assigns.current_scope
+    term = AchaLivro.Terms.get_term!(scope, id)
+    {:ok, _} = AchaLivro.Terms.delete_term(scope, term)
+    {:noreply, stream_delete(socket, :terms, term)}
+  end
+
   def handle_event("add_term", %{"term" => %{"value" => term_value}}, socket) do
     user_scope = socket.assigns.current_scope
     term = %{user_id: user_scope.user.id, value: term_value}

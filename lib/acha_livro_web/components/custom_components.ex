@@ -83,11 +83,21 @@ defmodule AchaLivroWeb.CustomComponents do
         <li
           :for={{dom_id, term} <- @streams.terms}
           id={dom_id}
-          class="transition-transform hover:scale-105"
+          class="group transition-transform hover:scale-105 flex items-center gap-2"
         >
           <span class="badge badge-lg badge-primary font-medium px-4 py-2 shadow-md">
             {term.value}
           </span>
+          <button
+            type="button"
+            class="btn btn-xs btn-circle btn-error ml-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+            phx-click="delete_term"
+            phx-value-id={term.id}
+            aria-label="Remover termo"
+            title="Remover termo"
+          >
+            ✕
+          </button>
         </li>
       </ul>
 
