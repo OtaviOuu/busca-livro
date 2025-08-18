@@ -98,7 +98,7 @@ defmodule AchaLivroWeb.CustomComponents do
           placeholder="Enter new term"
           class="input input-bordered input-lg flex-1 shadow-sm focus:ring-2 focus:ring-primary focus:border-primary transition"
           autocomplete="off"
-          phx-debounce="300"
+          phx-debounce="100"
         />
         <.button class="btn btn-primary btn-lg shadow-lg" phx-disable-with="Adding...">
           Add
