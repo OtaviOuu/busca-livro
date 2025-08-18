@@ -57,9 +57,6 @@ defmodule AchaLivroWeb.BookLive.Index do
         </div>
       <% else %>
         <CustomComponents.banner :if={!@loged}>
-          <h1 class="text-3xl font-bold">
-            📚 Bem-vindo ao Achados
-          </h1>
           <p class="py-4 text-base">
             Faça login para cadastrar termos de busca e monitorar a postagem de livros
           </p>
