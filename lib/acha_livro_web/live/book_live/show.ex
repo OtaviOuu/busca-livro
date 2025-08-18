@@ -74,11 +74,16 @@ defmodule AchaLivroWeb.BookLive.Show do
                   <.icon name="hero-book-open" class="h-5 w-5 mr-2" /> Abrir na Estante Virtual
                 </button>
               </a>
-              <.link :if={@is_book_from_current_user?} phx-click="delete" class="flex justify-center">
+              <div
+                :if={@is_book_from_current_user?}
+                phx-click="delete"
+                data-confirm="Tem certeza?"
+                class="flex justify-center"
+              >
                 <button class="btn btn-error btn-wide">
                   <.icon name="hero-trash" class="h-5 w-5 mr-2" /> Deletar livro
                 </button>
-              </.link>
+              </div>
             </div>
           </div>
         </div>
