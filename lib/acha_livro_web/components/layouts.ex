@@ -54,7 +54,7 @@ defmodule AchaLivroWeb.Layouts do
             </li>
             <div class="join">
               <li>
-                <.link class="btn" navigate={~p"/users/me"}>Me</.link>
+                <.link class="btn" navigate={~p"/users/achados"}>Achados</.link>
               </li>
               <li>
                 <.link class="btn" navigate={~p"/users/settings"}>Settings</.link>
@@ -65,6 +65,9 @@ defmodule AchaLivroWeb.Layouts do
             </div>
           <% else %>
             <div class="join">
+              <li>
+                <.link class="btn" navigate={~p"/users/achados"}>Achados</.link>
+              </li>
               <li>
                 <.link class="btn" navigate={~p"/users/register"}>Register</.link>
               </li>
@@ -162,11 +165,5 @@ defmodule AchaLivroWeb.Layouts do
       </button>
     </div>
     """
-  end
-
-  defp spark_line do
-    data = Enum.map(1..13, fn _ -> :rand.uniform(20) - 1 end)
-    # Emits svg sparkline
-    Sparkline.new(data) |> Sparkline.draw()
   end
 end

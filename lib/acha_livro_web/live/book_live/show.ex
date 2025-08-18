@@ -101,7 +101,7 @@ defmodule AchaLivroWeb.BookLive.Show do
     socket =
       socket
       |> put_flash(:info, "Livro '#{achado.book.title}' deletado com sucesso.")
-      |> push_navigate(to: ~p"/users/me")
+      |> push_navigate(to: ~p"/users/achados")
 
     {:noreply, socket}
   end
