@@ -35,7 +35,7 @@ defmodule AchaLivroWeb.Layouts do
 
   def app(assigns) do
     ~H"""
-    <header class="navbar px-4 sm:px-6 lg:px-8">
+    <header class="navbar px-4 sm:px-6 lg:px-8 sticky top-0 z-50 bg-base-100 shadow">
       <div class="flex-1">
         <.link navigate={~p"/books"} class="flex-1 flex w-fit items-center gap-2">
           <img src={~p"/images/logo.svg"} width="36" />
