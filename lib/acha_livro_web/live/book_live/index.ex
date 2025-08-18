@@ -93,7 +93,7 @@ defmodule AchaLivroWeb.BookLive.Index do
         socket =
           socket
           |> stream_insert(:terms, term, at: 0)
-          |> assign(form: to_form(changeset))
+          |> assign(form: to_form(changeset, action: :validate))
 
         {:noreply, socket}
 
