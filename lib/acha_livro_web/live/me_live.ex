@@ -53,7 +53,7 @@ defmodule AchaLivroWeb.MeLive do
         <div class="max-w-md">
           <h1 class="text-3xl font-bold">📚 Bem-vindo ao Achados</h1>
           <p class="py-4 text-base">
-            Aqui você encontra todos os seus livros encontrados de forma simples e organizada.
+            Aqui você acessa todos os seus livros encontrados de forma simples e organizada.
           </p>
         </div>
       </div>
