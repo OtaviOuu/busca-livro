@@ -4,7 +4,6 @@ defmodule AchaLivroWeb.Layouts do
   used by your application.
   """
   use AchaLivroWeb, :html
-  alias Contex.Sparkline
 
   # Embed all files in layouts/* within this module.
   # The default root.html.heex file contains the HTML
