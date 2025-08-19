@@ -24,6 +24,13 @@ defmodule AchaLivroWeb.MeLive do
   def render(assigns) do
     ~H"""
     <Layouts.app flash={@flash} current_scope={@current_scope}>
+      <.link
+        navigate={~p"/books"}
+        class="btn btn-sm btn-outline btn-primary rounded-xl"
+      >
+        <.icon name="hero-arrow-left" /> Voltar para Livros
+      </.link>
+
       <CustomComponents.banner>
         <h1 class="text-3xl font-bold">
           📚 Bem-vindo ao Achados
@@ -32,6 +39,7 @@ defmodule AchaLivroWeb.MeLive do
           Aqui você acessa todos os seus livros encontrados de forma simples e organizada.
         </p>
       </CustomComponents.banner>
+
       <%= if @loading_books do %>
         <div class="flex flex-row justify-center gap-6 flex-wrap p-4">
           <CustomComponents.book_card_skeleton :for={_book <- 1..get_max_books()} />
