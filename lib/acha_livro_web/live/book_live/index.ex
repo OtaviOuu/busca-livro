@@ -6,18 +6,28 @@ defmodule AchaLivroWeb.BookLive.Index do
   alias AchaLivro.Books
   alias AchaLivro.Achados
   alias AchaLivroWeb.CustomComponents
+  alias AchaLivroWeb.Presence
 
   @max_books 50
+  @presence_topic "users:books"
 
   def mount(_params, _session, socket) do
     connected? = connected?(socket)
     scope = socket.assigns.current_scope
 
     if connected? do
+      Phoenix.PubSub.subscribe(AchaLivro.PubSub, @presence_topic)
+
       send(self(), :loading_books)
+
+      {:ok, _} =
+        Presence.track(self(), @presence_topic, Ecto.UUID.generate(), %{})
 
       Books.subscribe_books()
     end
+
+    presences = Presence.list(@presence_topic)
+    simple_presence_map = simple_presence_map(presences)
 
     case scope do
       %{user: user} when not is_nil(user) ->
@@ -31,6 +41,7 @@ defmodule AchaLivroWeb.BookLive.Index do
 
         socket =
           socket
+          |> assign(:presences, simple_presence_map)
           |> assign(form: to_form(term_changeset))
           |> assign(:loading_books, true)
           |> assign(:loading_terms, true)
@@ -43,6 +54,7 @@ defmodule AchaLivroWeb.BookLive.Index do
           socket
           |> assign(:loading_books, true)
           |> assign(:loged, false)
+          |> assign(:presences, simple_presence_map)
 
         {:ok, socket}
     end
@@ -61,6 +73,8 @@ defmodule AchaLivroWeb.BookLive.Index do
             Faça login para cadastrar termos de busca e monitorar a postagem de livros
           </p>
         </CustomComponents.banner>
+        <.presence_card presences={@presences} />
+
         <CustomComponents.term_form
           :if={@loged && not @loading_terms}
           streams={@streams}
@@ -177,6 +191,50 @@ defmodule AchaLivroWeb.BookLive.Index do
     # |> stream(:terms, terms)
 
     {:noreply, socket}
+  end
+
+  def handle_info(%{event: "presence_diff", payload: diff}, socket) do
+    socket =
+      socket
+      |> remove_presence(diff.leaves)
+      |> add_presence(diff.joins)
+
+    {:noreply, socket}
+  end
+
+  defp remove_presence(socket, leaves) do
+    user_ids = Enum.map(leaves, fn {user_id, _} -> user_id end)
+
+    preseces = Map.drop(socket.assigns.presences, user_ids)
+
+    assign(socket, :presences, preseces)
+  end
+
+  defp add_presence(socket, joins) do
+    presences = Map.merge(socket.assigns.presences, simple_presence_map(joins))
+
+    assign(socket, :presences, presences)
+  end
+
+  def simple_presence_map(presences) do
+    Enum.into(presences, %{}, fn {user_id, %{metas: [meta | _]}} ->
+      {user_id, meta}
+    end)
+  end
+
+  def presence_card(assigns) do
+    ~H"""
+    <div class="card card-compact bg-base-100 shadow w-48">
+      <div class="card-body p-3">
+        <h3 class="card-title text-sm">
+          Users ativos
+          <div class="badge badge-secondary ml-2">
+            {map_size(@presences)}
+          </div>
+        </h3>
+      </div>
+    </div>
+    """
   end
 
   def get_max_books do
